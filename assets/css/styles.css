@@ -717,3 +717,14 @@ main:focus { outline: none; }
   font-variant-numeric: tabular-nums;
 }
 .order-form .price-breakdown { background: var(--blush); }
+
+.order-ready {
+  display: grid;
+  gap: 16px;
+  padding: clamp(24px, 5vw, 36px);
+  text-align: center;
+}
+.order-ready h2 { font-size: 1.9rem; }
+:lang(ar) .order-ready h2 { font-size: 1.6rem; }
+.order-ready h2:focus { outline: none; }
+.order-ready p { color: var(--ink-soft); }

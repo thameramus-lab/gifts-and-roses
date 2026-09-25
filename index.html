@@ -354,6 +354,16 @@
         <p class="field-hint" data-i18n="order.note">سيفتح واتساب برسالة جاهزة. راجِعها ثم اضغط إرسال.</p>
       </div>
     </form>
+
+    <div class="order-ready" id="order-ready" hidden>
+      <h2 id="order-ready-title" tabindex="-1" data-i18n="order.readyTitle">طلبك جاهز</h2>
+      <p data-i18n="order.readyText">اضغط الزر لفتح واتساب برسالة الطلب، ثم اضغط إرسال.</p>
+      <a class="btn btn-primary btn-block" data-ready-link href="#" target="_blank" rel="noopener">
+        <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
+        <span data-i18n="order.readyOpen">افتح واتساب</span>
+      </a>
+      <button class="btn btn-quiet btn-block" type="button" data-ready-back data-i18n="order.readyEdit">تعديل الطلب</button>
+    </div>
   </dialog>
 
   <script src="assets/js/config.js"></script>

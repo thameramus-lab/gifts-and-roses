@@ -80,6 +80,10 @@ window.I18N = {
     "order.name": "Your name (optional)",
     "order.submit": "Continue on WhatsApp",
     "order.note": "WhatsApp opens with the message ready. Check it, then tap send.",
+    "order.readyTitle": "Your order is ready",
+    "order.readyText": "Tap the button to open WhatsApp with your order, then tap send.",
+    "order.readyOpen": "Open WhatsApp",
+    "order.readyEdit": "Edit order",
   },
 
   messages: {

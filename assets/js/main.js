@@ -58,10 +58,12 @@
     if (dialog.open) setDialogProduct(currentProduct);
 
     try { localStorage.setItem(LANG_KEY, lang); } catch {}
-    const url = new URL(location.href);
-    if (lang === "en") url.searchParams.set("lang", "en");
-    else url.searchParams.delete("lang");
-    history.replaceState(null, "", url);
+    try {
+      const url = new URL(location.href);
+      if (lang === "en") url.searchParams.set("lang", "en");
+      else url.searchParams.delete("lang");
+      history.replaceState(null, "", url);
+    } catch {}
   }
 
   const money = (sar) =>
@@ -162,6 +164,8 @@
   const dateInput = form.elements.date;
   const cardInput = form.elements.card;
   const cardCount = document.getElementById("f-card-count");
+  const ready = document.getElementById("order-ready");
+  const readyLink = ready.querySelector("[data-ready-link]");
   let currentProduct = null;
 
   function todayISO() {
@@ -192,7 +196,13 @@
     form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
   }
 
+  function showForm() {
+    ready.hidden = true;
+    form.hidden = false;
+  }
+
   function openOrder(product) {
+    showForm();
     form.reset();
     clearErrors();
     setDialogProduct(product);
@@ -217,6 +227,11 @@
     if (e.target.name === "fulfil") updateConditionalFields();
   });
   cardInput.addEventListener("input", updateCardCount);
+  readyLink.addEventListener("click", () => setTimeout(() => dialog.close(), 0));
+  ready.querySelector("[data-ready-back]").addEventListener("click", () => {
+    showForm();
+    form.querySelector("button[type=submit]").focus();
+  });
 
   function validate() {
     const errors = [];
@@ -288,11 +303,18 @@
       return;
     }
     const url = waUrl(buildMessage());
-    dialog.close();
     // "noopener" as a window feature makes window.open return null, so detach manually.
     const win = window.open(url, "_blank");
-    if (win) win.opener = null;
-    else location.href = url;
+    if (win) {
+      win.opener = null;
+      dialog.close();
+      return;
+    }
+    // Pop-up blocked: offer a plain link to WhatsApp instead.
+    readyLink.href = url;
+    form.hidden = true;
+    ready.hidden = false;
+    document.getElementById("order-ready-title").focus();
   });
 
   // ---- Language ----
