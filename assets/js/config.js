@@ -4,7 +4,7 @@
 window.SITE_CONFIG = {
   // WhatsApp number in international format, digits only:
   // 966 followed by the mobile number without its leading 0 (05X XXX XXXX -> 9665XXXXXXXX).
-  whatsapp: "966566000069",
+  whatsapp: "966567056986",
 
   // Instagram username without the @. Leave empty to hide the Instagram button.
   instagram: "thamers_interlude_",
