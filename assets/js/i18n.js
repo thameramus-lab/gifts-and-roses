@@ -50,7 +50,7 @@ window.I18N = {
     "design.order": "Order this gift",
     "design.reset": "Start again",
     "design.flowers": "Flowers",
-    "design.flowersHint": "Flowers are 5 SAR each, and arranging is 10 SAR for every 5 flowers. Baby’s breath and eucalyptus are free.",
+    "design.flowersHint": "Flowers are 5 SAR each, and arranging is 15 SAR for every 5 flowers. Baby’s breath and eucalyptus are free.",
     "design.wrap": "Wrapping paper",
     "design.balloons": "Balloons",
     "design.balloonsHint": "Tap a colour to add a balloon. Tap a chosen balloon to remove it.",

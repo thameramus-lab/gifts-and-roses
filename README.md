@@ -11,7 +11,7 @@ Edit `assets/js/config.js`:
 - `mapsQuery`: what the "Open in Google Maps" button searches for.
 - `designer`: "Design your gift" pricing, used for every price on the site:
   - `pricePerFlower`: 5 SAR per flower (roses in four colours, sunflowers, lilies).
-  - `arrangingFee`: 10 SAR for every 5 flowers or part of 5 (1–5 flowers = 10, 6–10 = 20, …).
+  - `arrangingFee`: 15 SAR for every 5 flowers or part of 5 (1–5 flowers = 15, 6–10 = 30, …).
   - `balloonPrice`: 3 SAR each; `giftBoxPrice`: 25 SAR; `brandedPackagingPrice`: 0 (free).
   - `extras`: teddy bear, chocolates, scented candle. `null` shows "price on WhatsApp"; set a number to show the price.
 - `products`: what each product card loads into the designer (flowers, wrapping, balloons, gift box, extras, packaging). Card prices are worked out from these.

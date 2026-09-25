@@ -15,9 +15,9 @@ window.SITE_CONFIG = {
   // "Design your gift" pricing and choices. All prices in Saudi riyals.
   designer: {
     pricePerFlower: 5,
-    // Arranging fee: 10 for every 5 flowers or part of 5
-    // (1–5 flowers = 10, 6–10 = 20, 11–15 = 30, and so on).
-    arrangingFee: (flowers) => Math.ceil(flowers / 5) * 10,
+    // Arranging fee: 15 for every 5 flowers or part of 5
+    // (1–5 flowers = 15, 6–10 = 30, 11–15 = 45, and so on).
+    arrangingFee: (flowers) => Math.ceil(flowers / 5) * 15,
     maxPerFlower: 100,
 
     balloonPrice: 3,
