@@ -36,7 +36,7 @@ window.SITE_CONFIG = {
 
     // What the designer starts with.
     start: {
-      flowers: { "rose-red": 10 },
+      flowers: {},
       wrap: "kraft",
       balloons: [],
       giftBox: false,
