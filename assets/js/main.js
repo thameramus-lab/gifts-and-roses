@@ -4,12 +4,6 @@
   const root = document.documentElement;
   const LANG_KEY = "gr-lang";
 
-  const PRODUCT_KEYS = {
-    "surprise-bouquet": "p1.name",
-    "elegant-gift-set": "p2.name",
-    custom: "p3.name",
-  };
-
   // Arabic strings come straight from the markup, so they are written only once.
   const ar = {};
   document.querySelectorAll("[data-i18n]").forEach((el) => {
@@ -27,11 +21,40 @@
   let lang = "ar";
   const t = (key) => dicts[lang][key] ?? ar[key] ?? "";
   const msg = () => messages[lang];
+  const money = (sar) =>
+    new Intl.NumberFormat(msg().locale, { style: "currency", currency: "SAR", maximumFractionDigits: 0 }).format(sar);
+  const number = (n) => new Intl.NumberFormat(msg().locale).format(n);
 
   function waUrl(text) {
     return `https://wa.me/${cfg.whatsapp}?text=${encodeURIComponent(text)}`;
   }
 
+  // ---- Design your gift ----
+  const designer = window.GiftDesigner.create({
+    root: document.querySelector("[data-designer]"),
+    config: cfg,
+    msg,
+    money,
+    number,
+  });
+
+  function renderProductPrices() {
+    document.querySelectorAll("[data-product-price]").forEach((el) => {
+      const price = designer.priceFor(el.dataset.productPrice);
+      el.textContent = price.unpriced.length ? msg().from(money(price.total)) : money(price.total);
+    });
+  }
+
+  document.querySelectorAll("[data-customise]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      designer.load(btn.dataset.customise);
+      const section = document.getElementById("design");
+      section.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      document.getElementById("design-title").focus({ preventScroll: true });
+    });
+  });
+
+  // ---- Language ----
   function applyLang(next) {
     lang = next === "en" ? "en" : "ar";
     root.lang = lang;
@@ -53,9 +76,10 @@
       a.href = waUrl(msg().general);
     });
 
-    renderPrices();
+    designer.render();
+    renderProductPrices();
     updateCardCount();
-    if (dialog.open) setDialogProduct(currentProduct);
+    if (dialog.open) renderOrderSummary();
 
     try { localStorage.setItem(LANG_KEY, lang); } catch {}
     try {
@@ -64,79 +88,6 @@
       else url.searchParams.delete("lang");
       history.replaceState(null, "", url);
     } catch {}
-  }
-
-  const money = (sar) =>
-    new Intl.NumberFormat(msg().locale, { style: "currency", currency: "SAR", maximumFractionDigits: 0 }).format(sar);
-  const number = (n) => new Intl.NumberFormat(msg().locale).format(n);
-
-  // ---- Pricing ----
-  const bq = cfg.bouquet;
-
-  function bouquetPrice(count, withGift) {
-    const flowers = count * bq.pricePerFlower;
-    const fee = bq.arrangingFee(count);
-    const gift = withGift ? bq.giftPrice : 0;
-    return { flowers, fee, gift, total: flowers + fee + gift };
-  }
-
-  // A flower counter with gift option and price breakdown. The page and the
-  // order form each have one, built from the same [data-calc] markup.
-  function createCalc(el) {
-    const input = el.querySelector("[data-calc-count]");
-    const giftBox = el.querySelector("[data-calc-gift]");
-    const state = { count: bq.defaultFlowers, gift: false, giftLocked: false };
-
-    input.min = bq.minFlowers;
-    input.max = bq.maxFlowers;
-
-    function render() {
-      const price = bouquetPrice(state.count, state.gift);
-      input.value = state.count;
-      giftBox.checked = state.gift;
-      giftBox.disabled = state.giftLocked;
-      for (const [key, value] of Object.entries(price)) {
-        el.querySelector(`[data-calc-cost="${key}"]`).textContent = money(value);
-      }
-      el.querySelector("[data-gift-row]").hidden = !state.gift;
-      el.querySelector("[data-gift-label]").textContent = state.giftLocked ? msg().giftIncluded : msg().addGift;
-      el.querySelector("[data-gift-price]").textContent = money(bq.giftPrice);
-      el.querySelector('[data-calc-step="-1"]').disabled = state.count <= bq.minFlowers;
-      el.querySelector('[data-calc-step="1"]').disabled = state.count >= bq.maxFlowers;
-    }
-
-    function setCount(n) {
-      state.count = Math.min(bq.maxFlowers, Math.max(bq.minFlowers, Math.round(n) || bq.minFlowers));
-      render();
-    }
-
-    el.querySelectorAll("[data-calc-step]").forEach((btn) => {
-      btn.addEventListener("click", () => setCount(state.count + Number(btn.dataset.calcStep)));
-    });
-    input.addEventListener("change", () => setCount(Number(input.value)));
-    giftBox.addEventListener("change", () => {
-      state.gift = giftBox.checked;
-      render();
-    });
-
-    return {
-      state,
-      render,
-      set(count, gift, giftLocked) {
-        Object.assign(state, { gift, giftLocked });
-        setCount(count);
-      },
-      price: () => bouquetPrice(state.count, state.gift),
-    };
-  }
-
-  const [pageCalc, orderCalc] = [...document.querySelectorAll("[data-calc]")].map(createCalc);
-
-  function renderPrices() {
-    const note = msg().priceNote(money(bq.giftPrice), money(bq.pricePerFlower));
-    document.querySelectorAll("[data-price-note]").forEach((el) => { el.textContent = note; });
-    pageCalc.render();
-    orderCalc.render();
   }
 
   // ---- Links that don't depend on language ----
@@ -166,7 +117,6 @@
   const cardCount = document.getElementById("f-card-count");
   const ready = document.getElementById("order-ready");
   const readyLink = ready.querySelector("[data-ready-link]");
-  let currentProduct = null;
 
   function todayISO() {
     const d = new Date();
@@ -174,15 +124,44 @@
     return d.toISOString().slice(0, 10);
   }
 
-  function setDialogProduct(product) {
-    currentProduct = product;
-    dialog.querySelector("[data-order-product]").textContent = t(PRODUCT_KEYS[product]);
+  // The design as labelled lines, shared by the dialog summary and the WhatsApp message.
+  function designLines() {
+    const m = msg();
+    const d = designer.describe();
+    const lines = [[m.basedOnLabel, d.basedOn ?? m.custom]];
+    if (d.flowers.length) lines.push([m.flowers, m.list(d.flowers)]);
+    if (d.wrap) lines.push([m.wrap, d.wrap]);
+    if (d.balloons.length) lines.push([m.balloons, m.list(d.balloons)]);
+    if (d.extras.length) lines.push([m.extras, m.list(d.extras)]);
+    let total = money(d.price.total);
+    if (d.price.unpriced.length) {
+      total += ` ${m.pricePlus(m.list(d.price.unpriced.map((id) => m.names.extra[id])))}`;
+    }
+    return { lines, branded: d.branded, total };
+  }
+
+  function renderOrderSummary() {
+    const m = msg();
+    const { lines, branded, total } = designLines();
+    const box = dialog.querySelector("[data-order-summary]");
+    const list = document.createElement("dl");
+    const packagingPrice = cfg.designer.brandedPackagingPrice;
+    const packaging = branded ? [[m.packaging, packagingPrice ? money(packagingPrice) : m.free]] : [];
+    for (const [label, value] of [...lines, ...packaging, [m.price, total]]) {
+      const row = document.createElement("div");
+      const dt = document.createElement("dt");
+      const dd = document.createElement("dd");
+      dt.textContent = label;
+      dd.textContent = value;
+      row.append(dt, dd);
+      list.append(row);
+    }
+    list.lastChild.classList.add("price-total");
+    box.replaceChildren(list);
   }
 
   function updateConditionalFields() {
-    const delivery = form.elements.fulfil.value === "delivery";
-    form.querySelector('[data-when="delivery"]').hidden = !delivery;
-    form.querySelector('[data-when="custom"]').hidden = currentProduct !== "custom";
+    form.querySelector('[data-when="delivery"]').hidden = form.elements.fulfil.value !== "delivery";
   }
 
   function updateCardCount() {
@@ -201,24 +180,18 @@
     form.hidden = false;
   }
 
-  function openOrder(product) {
+  function openOrder() {
     showForm();
     form.reset();
     clearErrors();
-    setDialogProduct(product);
-    // "Build your bouquet" carries over what was chosen on the page;
-    // the photographed sets always come with their gift.
-    if (product === "custom") orderCalc.set(pageCalc.state.count, pageCalc.state.gift, false);
-    else orderCalc.set(bq.defaultFlowers, true, true);
+    renderOrderSummary();
     dateInput.min = todayISO();
     updateConditionalFields();
     updateCardCount();
     dialog.showModal();
   }
 
-  document.querySelectorAll("[data-order]").forEach((btn) => {
-    btn.addEventListener("click", () => openOrder(btn.dataset.order));
-  });
+  document.querySelectorAll("[data-d-order]").forEach((btn) => btn.addEventListener("click", openOrder));
   dialog.querySelector("[data-close]").addEventListener("click", () => dialog.close());
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) dialog.close();
@@ -274,21 +247,14 @@
     const date = new Date(y, mo - 1, d).toLocaleDateString(m.locale, {
       weekday: "long", day: "numeric", month: "long", year: "numeric",
     });
-    const lines = [
-      m.greeting,
-      `• ${m.product}: ${t(PRODUCT_KEYS[currentProduct])}`,
-      `• ${delivery ? m.delivery : m.pickup} — ${m.date}: ${date}`,
-      `• ${m.time}: ${f.time.selectedOptions[0].textContent}`,
-    ];
-    const price = orderCalc.price();
-    lines.push(`• ${m.flowerCount}: ${number(orderCalc.state.count)}`);
-    lines.push(
-      `• ${m.price}: ${money(price.total)} (${m.priceParts(money(price.flowers), money(price.fee), price.gift && money(price.gift))})`,
-    );
+    const { lines: design, branded, total } = designLines();
+    const lines = [m.greeting, ...design.map(([label, value]) => `• ${label}: ${value}`)];
+    if (branded) lines.push(`• ${m.brandedYes}`);
+    lines.push(`• ${m.price}: ${total}`);
+    lines.push(`• ${delivery ? m.delivery : m.pickup} — ${m.date}: ${date}`);
+    lines.push(`• ${m.time}: ${f.time.selectedOptions[0].textContent}`);
     if (delivery) lines.push(`• ${m.district}: ${f.district.value.trim()}`);
-    if (currentProduct === "custom" && f.details.value.trim()) {
-      lines.push(`• ${m.details}: ${f.details.value.trim()}`);
-    }
+    if (f.details.value.trim()) lines.push(`• ${m.details}: ${f.details.value.trim()}`);
     if (f.card.value.trim()) lines.push(`• ${m.card}: ${f.card.value.trim()}`);
     if (f.name.value.trim()) lines.push(`• ${m.name}: ${f.name.value.trim()}`);
     return lines.join("\n");
@@ -317,7 +283,7 @@
     document.getElementById("order-ready-title").focus();
   });
 
-  // ---- Language ----
+  // ---- Start ----
   document.querySelector("[data-lang-toggle]").addEventListener("click", () => {
     applyLang(lang === "ar" ? "en" : "ar");
   });

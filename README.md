@@ -9,10 +9,12 @@ Edit `assets/js/config.js`:
 - `whatsapp`: the shop's WhatsApp number, digits only, starting with 966. Currently 056 705 6986.
 - `instagram`: username without the @ (currently `thamers_interlude_`), or leave empty to hide the button.
 - `mapsQuery`: what the "Open in Google Maps" button searches for.
-- `bouquet`: pricing used on the page and in every order:
-  - `pricePerFlower`: 5 SAR per flower.
-  - `arrangingFee`: 10 SAR for every 5 flowers or part of 5 (1–5 flowers = 10, 6–10 = 20, 11–15 = 30, …).
-  - `giftPrice`: 25 SAR, on top of the flowers and arranging fee. The Surprise Bouquet and Elegant Gift Set always include a gift; in "Build your bouquet" it's optional.
+- `designer`: "Design your gift" pricing, used for every price on the site:
+  - `pricePerFlower`: 5 SAR per flower (roses in four colours, sunflowers, lilies).
+  - `arrangingFee`: 10 SAR for every 5 flowers or part of 5 (1–5 flowers = 10, 6–10 = 20, …).
+  - `balloonPrice`: 3 SAR each; `giftBoxPrice`: 25 SAR; `brandedPackagingPrice`: 0 (free).
+  - `extras`: teddy bear, chocolates, scented candle. `null` shows "price on WhatsApp"; set a number to show the price.
+- `products`: what each product card loads into the designer (flowers, wrapping, balloons, gift box, extras, packaging). Card prices are worked out from these.
 
 ## Editing text
 
@@ -33,7 +35,8 @@ Then open http://localhost:8000 (add `?lang=en` for English).
 - `assets/css/styles.css`: styles (colour and type tokens at the top)
 - `assets/js/config.js`: shop details
 - `assets/js/i18n.js`: English strings and WhatsApp message wording
-- `assets/js/main.js`: language switching, prices and the order form
+- `assets/js/designer.js`: "Design your gift" controls, pricing and the live drawing
+- `assets/js/main.js`: language switching, product cards and the order form
 - `assets/img/`: images cut from the logo and product photos
 
 It's a static site with no build step, so it can be hosted on GitHub Pages, Netlify or any web host.

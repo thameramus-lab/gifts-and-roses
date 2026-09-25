@@ -61,7 +61,7 @@
       </a>
       <nav class="site-nav" aria-label="القائمة الرئيسية" data-i18n-attr="aria-label:nav.label">
         <a href="#collection" data-i18n="nav.collection">المجموعة</a>
-        <a href="#build" data-i18n="nav.build">نسّق باقتك</a>
+        <a href="#design" data-i18n="nav.design">صمّم هديتك</a>
         <a href="#how" data-i18n="nav.how">طريقة الطلب</a>
         <a href="#contact" data-i18n="nav.contact">تواصل معنا</a>
       </nav>
@@ -111,84 +111,160 @@
       <div class="container">
         <div class="section-head">
           <h2 id="collection-title" data-i18n="collection.title">مجموعتنا</h2>
-          <p data-i18n="collection.intro">اختر باقة، وأخبرنا بالتاريخ ورسالة البطاقة، ونجهّزها لك.</p>
+          <p data-i18n="collection.intro">اختر تصميمًا وخصّصه كما تحب، أو صمّم هديتك من البداية.</p>
         </div>
 
         <ul class="products" role="list">
-          <li class="product" data-product="surprise-bouquet">
+          <li class="product">
+            <div class="product-media">
+              <img
+                src="assets/img/birthday-box-960.webp"
+                srcset="assets/img/birthday-box-560.webp 560w, assets/img/birthday-box-960.webp 960w"
+                sizes="(min-width: 1100px) 360px, (min-width: 640px) 45vw, 100vw"
+                width="960" height="960" loading="lazy"
+                alt="صندوق أسود فيه باقة ورود حمراء وزنبق أبيض مع دبدوب وعلبة هدية وبطاقة، وخلفه بالونات سوداء وذهبية وبالون عيد ميلاد"
+                data-i18n-attr="alt:prod.birthday-box.alt">
+            </div>
+            <div class="product-body">
+              <h3 class="product-name" data-i18n="prod.birthday-box.name">صندوق عيد الميلاد</h3>
+              <p class="product-desc" data-i18n="prod.birthday-box.desc">ورود حمراء وزنبق أبيض في ورق أسود، مع بالونات ودبدوب وعلبة هدية وبطاقة تهنئة.</p>
+              <p class="product-price" data-product-price="birthday-box"></p>
+              <button class="btn btn-primary btn-block" type="button" data-customise="birthday-box" data-i18n="product.customise">اختر وخصّص</button>
+            </div>
+          </li>
+          <li class="product">
+            <div class="product-media">
+              <img
+                src="assets/img/someone-special-box-960.webp"
+                srcset="assets/img/someone-special-box-560.webp 560w, assets/img/someone-special-box-960.webp 960w"
+                sizes="(min-width: 1100px) 360px, (min-width: 640px) 45vw, 100vw"
+                width="960" height="960" loading="lazy"
+                alt="علبة سوداء مفتوحة فيها ورود حمراء وشوكولاتة وشمعة ودبدوب أبيض صغير"
+                data-i18n-attr="alt:prod.someone-special-box.alt">
+            </div>
+            <div class="product-body">
+              <h3 class="product-name" data-i18n="prod.someone-special-box.name">صندوق لشخص مميز</h3>
+              <p class="product-desc" data-i18n="prod.someone-special-box.desc">ورود حمراء في علبة سوداء، مع شوكولاتة فيريرو روشيه وشمعة فانيلا معطّرة ودبدوب صغير.</p>
+              <p class="product-price" data-product-price="someone-special-box"></p>
+              <button class="btn btn-primary btn-block" type="button" data-customise="someone-special-box" data-i18n="product.customise">اختر وخصّص</button>
+            </div>
+          </li>
+          <li class="product">
+            <div class="product-media">
+              <img
+                src="assets/img/sunflower-bouquet-960.webp"
+                srcset="assets/img/sunflower-bouquet-560.webp 560w, assets/img/sunflower-bouquet-960.webp 960w"
+                sizes="(min-width: 1100px) 360px, (min-width: 640px) 45vw, 100vw"
+                width="960" height="960" loading="lazy"
+                alt="باقة دوّار الشمس مع الجبسوفيلا والكينا ملفوفة بورق كرافت على طاولة خشبية"
+                data-i18n-attr="alt:prod.sunflower-bouquet.alt">
+            </div>
+            <div class="product-body">
+              <h3 class="product-name" data-i18n="prod.sunflower-bouquet.name">باقة دوّار الشمس</h3>
+              <p class="product-desc" data-i18n="prod.sunflower-bouquet.desc">زهور دوّار الشمس مع الجبسوفيلا والكينا، ملفوفة بورق كرافت وشريط أسود.</p>
+              <p class="product-price" data-product-price="sunflower-bouquet"></p>
+              <button class="btn btn-primary btn-block" type="button" data-customise="sunflower-bouquet" data-i18n="product.customise">اختر وخصّص</button>
+            </div>
+          </li>
+          <li class="product">
             <div class="product-media">
               <img
                 src="assets/img/surprise-bouquet-960.webp"
                 srcset="assets/img/surprise-bouquet-560.webp 560w, assets/img/surprise-bouquet-960.webp 960w"
-                sizes="(min-width: 1100px) 340px, (min-width: 720px) 45vw, 100vw"
+                sizes="(min-width: 1100px) 360px, (min-width: 640px) 45vw, 100vw"
                 width="960" height="844" loading="lazy"
                 alt="ورود وردية وكريمية في مزهرية فخارية، ويد تضع بينها علبة هدية كحلية"
-                data-i18n-attr="alt:p1.alt">
+                data-i18n-attr="alt:prod.surprise-bouquet.alt">
             </div>
             <div class="product-body">
-              <h3 class="product-name" data-i18n="p1.name">باقة المفاجأة</h3>
-              <p class="product-desc" data-i18n="p1.desc">ورود وردية وكريمية مع زهرة الشمع والكينا في مزهرية فخارية، تختبئ بينها هدية صغيرة مغلّفة.</p>
-              <p class="product-price" data-price-note></p>
-              <button class="btn btn-primary btn-block" type="button" data-order="surprise-bouquet" data-i18n="product.order">اطلب هذه الباقة</button>
+              <h3 class="product-name" data-i18n="prod.surprise-bouquet.name">باقة المفاجأة</h3>
+              <p class="product-desc" data-i18n="prod.surprise-bouquet.desc">ورود وردية وكريمية مع زهرة الشمع والكينا في مزهرية فخارية، تختبئ بينها هدية صغيرة مغلّفة.</p>
+              <p class="product-price" data-product-price="surprise-bouquet"></p>
+              <button class="btn btn-primary btn-block" type="button" data-customise="surprise-bouquet" data-i18n="product.customise">اختر وخصّص</button>
             </div>
           </li>
-
-          <li class="product" data-product="elegant-gift-set">
+          <li class="product">
             <div class="product-media">
               <img
                 src="assets/img/elegant-gift-set-960.webp"
                 srcset="assets/img/elegant-gift-set-560.webp 560w, assets/img/elegant-gift-set-960.webp 960w"
-                sizes="(min-width: 1100px) 340px, (min-width: 720px) 45vw, 100vw"
+                sizes="(min-width: 1100px) 360px, (min-width: 640px) 45vw, 100vw"
                 width="960" height="850" loading="lazy"
                 alt="ورود حمراء في مزهرية زجاجية بجانب علبة هدية مربوطة بشريط عنابي، وبتلات ورد على الطاولة"
-                data-i18n-attr="alt:p2.alt">
+                data-i18n-attr="alt:prod.elegant-gift-set.alt">
             </div>
             <div class="product-body">
-              <h3 class="product-name" data-i18n="p2.name">طقم الهدية الأنيق</h3>
-              <p class="product-desc" data-i18n="p2.desc">ورود حمراء مع زهرة الجبسوفيلا في مزهرية زجاجية، بجانب علبة هدية مربوطة بشريط ساتان عنابي.</p>
-              <p class="product-price" data-price-note></p>
-              <button class="btn btn-primary btn-block" type="button" data-order="elegant-gift-set" data-i18n="product.orderSet">اطلب هذا الطقم</button>
+              <h3 class="product-name" data-i18n="prod.elegant-gift-set.name">طقم الهدية الأنيق</h3>
+              <p class="product-desc" data-i18n="prod.elegant-gift-set.desc">ورود حمراء مع زهرة الجبسوفيلا في مزهرية زجاجية، بجانب علبة هدية مربوطة بشريط ساتان عنابي.</p>
+              <p class="product-price" data-product-price="elegant-gift-set"></p>
+              <button class="btn btn-primary btn-block" type="button" data-customise="elegant-gift-set" data-i18n="product.customise">اختر وخصّص</button>
             </div>
           </li>
-
         </ul>
       </div>
     </section>
 
-    <section class="section build" id="build" aria-labelledby="build-title">
+    <section class="section design" id="design" aria-labelledby="design-title">
       <div class="container">
-        <div class="build-panel">
-          <div class="build-art">
-            <img src="assets/img/watercolor-gift.webp" width="600" height="440" loading="lazy" alt="">
-          </div>
-          <div class="build-copy">
-            <h2 id="build-title" data-i18n="p3.name">نسّق باقتك</h2>
-            <p data-i18n="p3.desc">اختر عدد الورود وأضف هدية إن أردت. الوردة بخمسة ريالات، ورسوم التنسيق عشرة ريالات لكل خمس ورود، والهدية بخمسة وعشرين ريالًا.</p>
-            <div class="builder" data-calc>
-              <label class="builder-label" for="flower-count" data-i18n="builder.count">عدد الورود</label>
-              <div class="stepper">
-                <button class="stepper-btn" type="button" data-calc-step="-1" aria-controls="flower-count" aria-label="وردة أقل" data-i18n-attr="aria-label:builder.less">
-                  <svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg>
-                </button>
-                <input id="flower-count" data-calc-count type="number" inputmode="numeric" min="1" max="200" step="1" value="10">
-                <button class="stepper-btn" type="button" data-calc-step="1" aria-controls="flower-count" aria-label="وردة أكثر" data-i18n-attr="aria-label:builder.more">
-                  <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
-                </button>
+        <div class="section-head">
+          <h2 id="design-title" tabindex="-1" data-i18n="design.title">صمّم هديتك</h2>
+          <p data-i18n="design.intro">اختر الورود والتغليف والبالونات والإضافات، وشاهد شكل هديتك وسعرها وأنت تختار.</p>
+        </div>
+
+        <div class="designer" data-designer>
+          <div class="designer-stage">
+            <div class="designer-preview" data-d-preview></div>
+            <p class="field-hint designer-caption" data-i18n="design.caption">رسم توضيحي. تُنسَّق هديتك يدويًا، فتختلف قليلًا عن الرسم.</p>
+            <div class="designer-summary">
+              <p class="designer-based" data-d-based hidden></p>
+              <dl class="price-breakdown" data-d-lines></dl>
+              <p class="designer-total"><span data-i18n="design.total">المجموع</span> <strong data-d-total aria-live="polite"></strong></p>
+              <p class="field-hint" data-d-unpriced hidden></p>
+              <div class="designer-actions">
+                <button class="btn btn-primary" type="button" data-d-order data-i18n="design.order">اطلب هذه الهدية</button>
+                <button class="btn btn-quiet" type="button" data-d-reset data-i18n="design.reset">ابدأ من جديد</button>
               </div>
-              <label class="gift-toggle">
-                <input type="checkbox" data-calc-gift>
-                <span data-gift-label></span>
-                <span class="gift-price" data-gift-price></span>
-              </label>
-              <dl class="price-breakdown">
-                <div><dt data-i18n="builder.flowers">الورود</dt><dd data-calc-cost="flowers"></dd></div>
-                <div><dt data-i18n="builder.fee">رسوم التنسيق</dt><dd data-calc-cost="fee"></dd></div>
-                <div data-gift-row hidden><dt data-i18n="builder.gift">الهدية</dt><dd data-calc-cost="gift"></dd></div>
-                <div class="price-total"><dt data-i18n="builder.total">المجموع</dt><dd data-calc-cost="total" aria-live="polite"></dd></div>
-              </dl>
-              <p class="field-hint" data-i18n="builder.extras">لا يشمل المجموع المزهرية أو الإضافات الأخرى، ونؤكدها معك على واتساب.</p>
             </div>
-            <button class="btn btn-primary" type="button" data-order="custom" data-i18n="product.custom">اطلب هذه الباقة</button>
+          </div>
+
+          <div class="designer-options">
+            <fieldset class="d-group">
+              <legend data-i18n="design.flowers">الورود</legend>
+              <p class="field-hint" data-i18n="design.flowersHint">الوردة بخمسة ريالات، ورسوم التنسيق عشرة ريالات لكل خمس ورود. الجبسوفيلا والكينا مجانًا.</p>
+              <ul class="d-rows" role="list" data-d-flowers></ul>
+            </fieldset>
+
+            <fieldset class="d-group">
+              <legend data-i18n="design.wrap">ورق التغليف</legend>
+              <div class="choice-row" data-d-wraps></div>
+            </fieldset>
+
+            <fieldset class="d-group">
+              <legend><span data-i18n="design.balloons">البالونات</span> <span class="d-legend-meta" data-d-balloon-price></span></legend>
+              <p class="field-hint" data-i18n="design.balloonsHint">اضغط على لون لإضافة بالون، واضغط على البالون المختار لحذفه.</p>
+              <div class="balloon-swatches" data-d-balloon-swatches></div>
+              <div class="balloon-chips" data-d-balloons></div>
+              <p class="field-hint" data-d-balloon-count aria-live="polite"></p>
+            </fieldset>
+
+            <fieldset class="d-group">
+              <legend data-i18n="design.extras">الإضافات</legend>
+              <div class="d-checks" data-d-extras></div>
+            </fieldset>
+
+            <fieldset class="d-group">
+              <legend data-i18n="design.packaging">تغليف هدايا وورود</legend>
+              <label class="d-check">
+                <input type="checkbox" data-d-branded>
+                <span data-i18n="design.brandedLabel">شريط وبطاقة باسم هدايا وورود</span>
+                <span class="d-check-price" data-d-branded-price></span>
+              </label>
+            </fieldset>
+          </div>
+
+          <div class="designer-bar">
+            <p><span data-i18n="design.total">المجموع</span> <strong data-d-total-bar></strong></p>
+            <button class="btn btn-primary" type="button" data-d-order data-i18n="design.order">اطلب هذه الهدية</button>
           </div>
         </div>
       </div>
@@ -201,8 +277,8 @@
         </div>
         <ol class="steps" role="list">
           <li>
-            <h3 data-i18n="how.1.title">اختر الباقة</h3>
-            <p data-i18n="how.1.text">من المجموعة أعلاه، أو نسّق باقتك بنفسك.</p>
+            <h3 data-i18n="how.1.title">صمّم هديتك</h3>
+            <p data-i18n="how.1.text">ابدأ من أحد تصاميمنا أو من الصفر، واختر الورود والبالونات والإضافات.</p>
           </li>
           <li>
             <h3 data-i18n="how.2.title">حدّد التاريخ واكتب البطاقة</h3>
@@ -267,30 +343,7 @@
         </button>
       </div>
 
-      <div class="builder" data-calc>
-        <label class="builder-label" for="f-flowers" data-i18n="builder.count">عدد الورود</label>
-        <div class="stepper">
-          <button class="stepper-btn" type="button" data-calc-step="-1" aria-controls="f-flowers" aria-label="وردة أقل" data-i18n-attr="aria-label:builder.less">
-            <svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg>
-          </button>
-          <input id="f-flowers" data-calc-count type="number" inputmode="numeric" min="1" max="200" step="1" value="10">
-          <button class="stepper-btn" type="button" data-calc-step="1" aria-controls="f-flowers" aria-label="وردة أكثر" data-i18n-attr="aria-label:builder.more">
-            <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
-          </button>
-        </div>
-        <label class="gift-toggle">
-          <input type="checkbox" data-calc-gift>
-          <span data-gift-label></span>
-          <span class="gift-price" data-gift-price></span>
-        </label>
-        <dl class="price-breakdown">
-          <div><dt data-i18n="builder.flowers">الورود</dt><dd data-calc-cost="flowers"></dd></div>
-          <div><dt data-i18n="builder.fee">رسوم التنسيق</dt><dd data-calc-cost="fee"></dd></div>
-          <div data-gift-row hidden><dt data-i18n="builder.gift">الهدية</dt><dd data-calc-cost="gift"></dd></div>
-          <div class="price-total"><dt data-i18n="builder.total">المجموع</dt><dd data-calc-cost="total" aria-live="polite"></dd></div>
-        </dl>
-        <p class="field-hint" data-i18n="builder.extras">لا يشمل المجموع المزهرية أو الإضافات الأخرى، ونؤكدها معك على واتساب.</p>
-      </div>
+      <div class="order-summary" data-order-summary></div>
 
       <div class="error-summary" id="error-summary" tabindex="-1" hidden>
         <p data-i18n="order.errorSummary">يرجى تصحيح ما يلي:</p>
@@ -329,10 +382,10 @@
         <p class="field-error" id="f-district-error" hidden></p>
       </div>
 
-      <div class="field" data-when="custom">
-        <label for="f-details" data-i18n="order.details">الألوان والمناسبة (اختياري)</label>
+      <div class="field">
+        <label for="f-details" data-i18n="order.details">ملاحظات (اختياري)</label>
         <textarea id="f-details" name="details" rows="2" aria-describedby="f-details-hint"></textarea>
-        <p class="field-hint" id="f-details-hint" data-i18n="order.detailsHint">مثال: ورود حمراء وبيضاء لعيد ميلاد.</p>
+        <p class="field-hint" id="f-details-hint" data-i18n="order.detailsHint">مثال: المناسبة، أو نص تريده على البالون.</p>
       </div>
 
       <div class="field">
@@ -368,6 +421,7 @@
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/designer.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>
