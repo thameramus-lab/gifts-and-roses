@@ -7,11 +7,25 @@ window.SITE_CONFIG = {
   whatsapp: "966566000069",
 
   // Instagram username without the @. Leave empty to hide the Instagram button.
-  instagram: "",
+  instagram: "thamers_interlude_",
+
+  // What the "Open in Google Maps" button searches for.
+  mapsQuery: "Aabir Al Qarath St, Obhur Al Shamaliyah, Jeddah 23817",
 
   // Prices in Saudi riyals, e.g. 250. Leave as null to hide the price on the card.
   prices: {
     "surprise-bouquet": null,
     "elegant-gift-set": null,
+  },
+
+  // "Build your bouquet" pricing, in Saudi riyals.
+  bouquet: {
+    pricePerFlower: 5,
+    // Arranging fee for a bouquet of `flowers` flowers. It grows with the bouquet:
+    // 2 flowers = 10 for the flowers + 10 arranging = 20.
+    arrangingFee: (flowers) => flowers * 5,
+    defaultFlowers: 10,
+    minFlowers: 1,
+    maxFlowers: 200,
   },
 };

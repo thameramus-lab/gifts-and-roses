@@ -2,17 +2,19 @@
 
 Website for Gifts & Roses, a floral and gift boutique in Jeddah. Arabic by default with an English toggle; customers order through WhatsApp.
 
-## Before going live
+## Shop settings
 
 Edit `assets/js/config.js`:
 
-- `whatsapp`: the shop's WhatsApp number, digits only, starting with 966 (e.g. `966512345678`). Currently set to 056 600 0069.
-- `instagram`: username without the @, or leave empty to hide the button.
-- `prices`: price in SAR for each product, or `null` to hide it.
+- `whatsapp`: the shop's WhatsApp number, digits only, starting with 966. Currently 056 600 0069.
+- `instagram`: username without the @ (currently `thamers_interlude_`), or leave empty to hide the button.
+- `mapsQuery`: what the "Open in Google Maps" button searches for.
+- `prices`: price in SAR for the Surprise Bouquet and Elegant Gift Set, or `null` to hide it.
+- `bouquet`: "Build your bouquet" pricing. Each flower is `pricePerFlower` (5 SAR), plus `arrangingFee`, which is 5 SAR per flower, so 2 flowers cost 10 + 10 = 20 SAR. Change that one line to use a different rule.
 
 ## Editing text
 
-- Arabic text is in `index.html`.
+- Arabic text is in `index.html` (the shop's Arabic name is هدايا وورود).
 - English text is in `assets/js/i18n.js`, under the same keys as the `data-i18n` attributes in the HTML.
 
 ## Preview locally

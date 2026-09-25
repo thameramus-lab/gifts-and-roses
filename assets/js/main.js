@@ -64,20 +64,53 @@
     history.replaceState(null, "", url);
   }
 
+  const money = (sar) =>
+    new Intl.NumberFormat(msg().locale, { style: "currency", currency: "SAR", maximumFractionDigits: 0 }).format(sar);
+  const number = (n) => new Intl.NumberFormat(msg().locale).format(n);
+
   function renderPrices() {
-    const fmt = new Intl.NumberFormat(msg().locale, {
-      style: "currency",
-      currency: "SAR",
-      maximumFractionDigits: 0,
-    });
     document.querySelectorAll("[data-product]").forEach((card) => {
       const el = card.querySelector("[data-price]");
       const price = cfg.prices[card.dataset.product];
       if (!el) return;
       el.hidden = price == null;
-      if (price != null) el.textContent = fmt.format(price);
+      if (price != null) el.textContent = money(price);
     });
+    renderBuilder();
   }
+
+  // ---- Build your bouquet ----
+  const bq = cfg.bouquet;
+  const countInput = document.getElementById("flower-count");
+  let flowerCount = bq.defaultFlowers;
+
+  function bouquetPrice(n) {
+    const flowers = n * bq.pricePerFlower;
+    const fee = bq.arrangingFee(n);
+    return { flowers, fee, total: flowers + fee };
+  }
+
+  function setFlowerCount(n) {
+    flowerCount = Math.min(bq.maxFlowers, Math.max(bq.minFlowers, Math.round(n) || bq.minFlowers));
+    renderBuilder();
+  }
+
+  function renderBuilder() {
+    const price = bouquetPrice(flowerCount);
+    countInput.value = flowerCount;
+    for (const [key, value] of Object.entries(price)) {
+      document.querySelector(`[data-cost="${key}"]`).textContent = money(value);
+    }
+    document.querySelector('[data-step="-1"]').disabled = flowerCount <= bq.minFlowers;
+    document.querySelector('[data-step="1"]').disabled = flowerCount >= bq.maxFlowers;
+  }
+
+  countInput.min = bq.minFlowers;
+  countInput.max = bq.maxFlowers;
+  document.querySelectorAll("[data-step]").forEach((btn) => {
+    btn.addEventListener("click", () => setFlowerCount(flowerCount + Number(btn.dataset.step)));
+  });
+  countInput.addEventListener("change", () => setFlowerCount(Number(countInput.value)));
 
   // ---- Links that don't depend on language ----
   document.querySelectorAll("[data-wa-link]").forEach((a) => {
@@ -91,6 +124,8 @@
     ig.rel = "noopener";
     ig.hidden = false;
   }
+  document.querySelector("[data-maps-link]").href =
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cfg.mapsQuery)}`;
   document.querySelectorAll("[data-year]").forEach((el) => {
     el.textContent = new Date().getFullYear();
   });
@@ -112,7 +147,11 @@
 
   function setDialogProduct(product) {
     currentProduct = product;
-    dialog.querySelector("[data-order-product]").textContent = t(PRODUCT_KEYS[product]);
+    let label = t(PRODUCT_KEYS[product]);
+    if (product === "custom") {
+      label += ` — ${msg().flowers(flowerCount, number)}${msg().sep}${money(bouquetPrice(flowerCount).total)}`;
+    }
+    dialog.querySelector("[data-order-product]").textContent = label;
   }
 
   function updateConditionalFields() {
@@ -164,10 +203,6 @@
     if (form.elements.fulfil.value === "delivery" && !district.value.trim()) {
       errors.push([district, m.errDistrict]);
     }
-    const details = form.elements.details;
-    if (currentProduct === "custom" && !details.value.trim()) {
-      errors.push([details, m.errDetails]);
-    }
     return errors;
   }
 
@@ -206,7 +241,12 @@
       `• ${m.time}: ${f.time.selectedOptions[0].textContent}`,
     ];
     if (delivery) lines.push(`• ${m.district}: ${f.district.value.trim()}`);
-    if (currentProduct === "custom") lines.push(`• ${m.details}: ${f.details.value.trim()}`);
+    if (currentProduct === "custom") {
+      const price = bouquetPrice(flowerCount);
+      lines.push(`• ${m.flowerCount}: ${number(flowerCount)}`);
+      lines.push(`• ${m.price}: ${money(price.total)} (${m.priceParts(money(price.flowers), money(price.fee))})`);
+      if (f.details.value.trim()) lines.push(`• ${m.details}: ${f.details.value.trim()}`);
+    }
     if (f.card.value.trim()) lines.push(`• ${m.card}: ${f.card.value.trim()}`);
     if (f.name.value.trim()) lines.push(`• ${m.name}: ${f.name.value.trim()}`);
     return lines.join("\n");
