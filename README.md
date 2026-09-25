@@ -9,8 +9,10 @@ Edit `assets/js/config.js`:
 - `whatsapp`: the shop's WhatsApp number, digits only, starting with 966. Currently 056 600 0069.
 - `instagram`: username without the @ (currently `thamers_interlude_`), or leave empty to hide the button.
 - `mapsQuery`: what the "Open in Google Maps" button searches for.
-- `prices`: price in SAR for the Surprise Bouquet and Elegant Gift Set, or `null` to hide it.
-- `bouquet`: "Build your bouquet" pricing. Each flower is `pricePerFlower` (5 SAR), plus `arrangingFee`, which is 5 SAR per flower, so 2 flowers cost 10 + 10 = 20 SAR. Change that one line to use a different rule.
+- `bouquet`: pricing used on the page and in every order:
+  - `pricePerFlower`: 5 SAR per flower.
+  - `arrangingFee`: 10 SAR for every 5 flowers or part of 5 (1–5 flowers = 10, 6–10 = 20, 11–15 = 30, …).
+  - `giftPrice`: 25 SAR, on top of the flowers and arranging fee. The Surprise Bouquet and Elegant Gift Set always include a gift; in "Build your bouquet" it's optional.
 
 ## Editing text
 

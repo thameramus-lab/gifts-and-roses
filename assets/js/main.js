@@ -68,49 +68,74 @@
     new Intl.NumberFormat(msg().locale, { style: "currency", currency: "SAR", maximumFractionDigits: 0 }).format(sar);
   const number = (n) => new Intl.NumberFormat(msg().locale).format(n);
 
-  function renderPrices() {
-    document.querySelectorAll("[data-product]").forEach((card) => {
-      const el = card.querySelector("[data-price]");
-      const price = cfg.prices[card.dataset.product];
-      if (!el) return;
-      el.hidden = price == null;
-      if (price != null) el.textContent = money(price);
-    });
-    renderBuilder();
-  }
-
-  // ---- Build your bouquet ----
+  // ---- Pricing ----
   const bq = cfg.bouquet;
-  const countInput = document.getElementById("flower-count");
-  let flowerCount = bq.defaultFlowers;
 
-  function bouquetPrice(n) {
-    const flowers = n * bq.pricePerFlower;
-    const fee = bq.arrangingFee(n);
-    return { flowers, fee, total: flowers + fee };
+  function bouquetPrice(count, withGift) {
+    const flowers = count * bq.pricePerFlower;
+    const fee = bq.arrangingFee(count);
+    const gift = withGift ? bq.giftPrice : 0;
+    return { flowers, fee, gift, total: flowers + fee + gift };
   }
 
-  function setFlowerCount(n) {
-    flowerCount = Math.min(bq.maxFlowers, Math.max(bq.minFlowers, Math.round(n) || bq.minFlowers));
-    renderBuilder();
-  }
+  // A flower counter with gift option and price breakdown. The page and the
+  // order form each have one, built from the same [data-calc] markup.
+  function createCalc(el) {
+    const input = el.querySelector("[data-calc-count]");
+    const giftBox = el.querySelector("[data-calc-gift]");
+    const state = { count: bq.defaultFlowers, gift: false, giftLocked: false };
 
-  function renderBuilder() {
-    const price = bouquetPrice(flowerCount);
-    countInput.value = flowerCount;
-    for (const [key, value] of Object.entries(price)) {
-      document.querySelector(`[data-cost="${key}"]`).textContent = money(value);
+    input.min = bq.minFlowers;
+    input.max = bq.maxFlowers;
+
+    function render() {
+      const price = bouquetPrice(state.count, state.gift);
+      input.value = state.count;
+      giftBox.checked = state.gift;
+      giftBox.disabled = state.giftLocked;
+      for (const [key, value] of Object.entries(price)) {
+        el.querySelector(`[data-calc-cost="${key}"]`).textContent = money(value);
+      }
+      el.querySelector("[data-gift-row]").hidden = !state.gift;
+      el.querySelector("[data-gift-label]").textContent = state.giftLocked ? msg().giftIncluded : msg().addGift;
+      el.querySelector("[data-gift-price]").textContent = money(bq.giftPrice);
+      el.querySelector('[data-calc-step="-1"]').disabled = state.count <= bq.minFlowers;
+      el.querySelector('[data-calc-step="1"]').disabled = state.count >= bq.maxFlowers;
     }
-    document.querySelector('[data-step="-1"]').disabled = flowerCount <= bq.minFlowers;
-    document.querySelector('[data-step="1"]').disabled = flowerCount >= bq.maxFlowers;
+
+    function setCount(n) {
+      state.count = Math.min(bq.maxFlowers, Math.max(bq.minFlowers, Math.round(n) || bq.minFlowers));
+      render();
+    }
+
+    el.querySelectorAll("[data-calc-step]").forEach((btn) => {
+      btn.addEventListener("click", () => setCount(state.count + Number(btn.dataset.calcStep)));
+    });
+    input.addEventListener("change", () => setCount(Number(input.value)));
+    giftBox.addEventListener("change", () => {
+      state.gift = giftBox.checked;
+      render();
+    });
+
+    return {
+      state,
+      render,
+      set(count, gift, giftLocked) {
+        Object.assign(state, { gift, giftLocked });
+        setCount(count);
+      },
+      price: () => bouquetPrice(state.count, state.gift),
+    };
   }
 
-  countInput.min = bq.minFlowers;
-  countInput.max = bq.maxFlowers;
-  document.querySelectorAll("[data-step]").forEach((btn) => {
-    btn.addEventListener("click", () => setFlowerCount(flowerCount + Number(btn.dataset.step)));
-  });
-  countInput.addEventListener("change", () => setFlowerCount(Number(countInput.value)));
+  const [pageCalc, orderCalc] = [...document.querySelectorAll("[data-calc]")].map(createCalc);
+
+  function renderPrices() {
+    const note = msg().priceNote(money(bq.giftPrice), money(bq.pricePerFlower));
+    document.querySelectorAll("[data-price-note]").forEach((el) => { el.textContent = note; });
+    pageCalc.render();
+    orderCalc.render();
+  }
 
   // ---- Links that don't depend on language ----
   document.querySelectorAll("[data-wa-link]").forEach((a) => {
@@ -147,11 +172,7 @@
 
   function setDialogProduct(product) {
     currentProduct = product;
-    let label = t(PRODUCT_KEYS[product]);
-    if (product === "custom") {
-      label += ` — ${msg().flowers(flowerCount, number)}${msg().sep}${money(bouquetPrice(flowerCount).total)}`;
-    }
-    dialog.querySelector("[data-order-product]").textContent = label;
+    dialog.querySelector("[data-order-product]").textContent = t(PRODUCT_KEYS[product]);
   }
 
   function updateConditionalFields() {
@@ -175,6 +196,10 @@
     form.reset();
     clearErrors();
     setDialogProduct(product);
+    // "Build your bouquet" carries over what was chosen on the page;
+    // the photographed sets always come with their gift.
+    if (product === "custom") orderCalc.set(pageCalc.state.count, pageCalc.state.gift, false);
+    else orderCalc.set(bq.defaultFlowers, true, true);
     dateInput.min = todayISO();
     updateConditionalFields();
     updateCardCount();
@@ -240,12 +265,14 @@
       `• ${delivery ? m.delivery : m.pickup} — ${m.date}: ${date}`,
       `• ${m.time}: ${f.time.selectedOptions[0].textContent}`,
     ];
+    const price = orderCalc.price();
+    lines.push(`• ${m.flowerCount}: ${number(orderCalc.state.count)}`);
+    lines.push(
+      `• ${m.price}: ${money(price.total)} (${m.priceParts(money(price.flowers), money(price.fee), price.gift && money(price.gift))})`,
+    );
     if (delivery) lines.push(`• ${m.district}: ${f.district.value.trim()}`);
-    if (currentProduct === "custom") {
-      const price = bouquetPrice(flowerCount);
-      lines.push(`• ${m.flowerCount}: ${number(flowerCount)}`);
-      lines.push(`• ${m.price}: ${money(price.total)} (${m.priceParts(money(price.flowers), money(price.fee))})`);
-      if (f.details.value.trim()) lines.push(`• ${m.details}: ${f.details.value.trim()}`);
+    if (currentProduct === "custom" && f.details.value.trim()) {
+      lines.push(`• ${m.details}: ${f.details.value.trim()}`);
     }
     if (f.card.value.trim()) lines.push(`• ${m.card}: ${f.card.value.trim()}`);
     if (f.name.value.trim()) lines.push(`• ${m.name}: ${f.name.value.trim()}`);

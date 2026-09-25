@@ -693,3 +693,27 @@ main:focus { outline: none; }
 @media (max-width: 600px) {
   .contact-address { justify-content: center; }
 }
+
+.gift-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.gift-toggle input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--rose);
+  cursor: pointer;
+}
+.gift-toggle:has(input:disabled),
+.gift-toggle input:disabled { cursor: default; }
+.gift-price {
+  color: var(--rose);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.order-form .price-breakdown { background: var(--blush); }

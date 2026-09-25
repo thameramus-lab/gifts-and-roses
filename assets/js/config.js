@@ -10,20 +10,17 @@ window.SITE_CONFIG = {
   instagram: "thamers_interlude_",
 
   // What the "Open in Google Maps" button searches for.
-  mapsQuery: "Aabir Al Qarath St, Obhur Al Shamaliyah, Jeddah 23817",
+  mapsQuery: "Aabir Al Qarath St, Obhur Al-Shamaliyah, Jeddah 23817",
 
-  // Prices in Saudi riyals, e.g. 250. Leave as null to hide the price on the card.
-  prices: {
-    "surprise-bouquet": null,
-    "elegant-gift-set": null,
-  },
-
-  // "Build your bouquet" pricing, in Saudi riyals.
+  // Pricing, in Saudi riyals. Used by "Build your bouquet" and by every order form.
   bouquet: {
     pricePerFlower: 5,
-    // Arranging fee for a bouquet of `flowers` flowers. It grows with the bouquet:
-    // 2 flowers = 10 for the flowers + 10 arranging = 20.
-    arrangingFee: (flowers) => flowers * 5,
+    // Arranging fee: 10 for every 5 flowers or part of 5
+    // (1–5 flowers = 10, 6–10 = 20, 11–15 = 30, and so on).
+    arrangingFee: (flowers) => Math.ceil(flowers / 5) * 10,
+    // Gift price, on top of the flowers and arranging fee.
+    // The Surprise Bouquet and Elegant Gift Set always include a gift.
+    giftPrice: 25,
     defaultFlowers: 10,
     minFlowers: 1,
     maxFlowers: 200,

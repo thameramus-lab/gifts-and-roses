@@ -34,7 +34,7 @@
     "image": "assets/img/og-image.jpg",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Aabir Al Qarath St, Obhur Al Shamaliyah",
+      "streetAddress": "Aabir Al Qarath St, Obhur Al-Shamaliyah",
       "addressLocality": "Jeddah",
       "postalCode": "23817",
       "addressCountry": "SA"
@@ -127,8 +127,8 @@
             </div>
             <div class="product-body">
               <h3 class="product-name" data-i18n="p1.name">باقة المفاجأة</h3>
-              <p class="product-price" data-price hidden></p>
               <p class="product-desc" data-i18n="p1.desc">ورود وردية وكريمية مع زهرة الشمع والكينا في مزهرية فخارية، تختبئ بينها هدية صغيرة مغلّفة.</p>
+              <p class="product-price" data-price-note></p>
               <button class="btn btn-primary btn-block" type="button" data-order="surprise-bouquet" data-i18n="product.order">اطلب هذه الباقة</button>
             </div>
           </li>
@@ -145,8 +145,8 @@
             </div>
             <div class="product-body">
               <h3 class="product-name" data-i18n="p2.name">طقم الهدية الأنيق</h3>
-              <p class="product-price" data-price hidden></p>
               <p class="product-desc" data-i18n="p2.desc">ورود حمراء مع زهرة الجبسوفيلا في مزهرية زجاجية، بجانب علبة هدية مربوطة بشريط ساتان عنابي.</p>
+              <p class="product-price" data-price-note></p>
               <button class="btn btn-primary btn-block" type="button" data-order="elegant-gift-set" data-i18n="product.orderSet">اطلب هذا الطقم</button>
             </div>
           </li>
@@ -163,23 +163,30 @@
           </div>
           <div class="build-copy">
             <h2 id="build-title" data-i18n="p3.name">نسّق باقتك</h2>
-            <p data-i18n="p3.desc">اختر عدد الورود: سعر الوردة خمسة ريالات، وتُضاف رسوم تنسيق تزيد مع حجم الباقة.</p>
-            <div class="builder">
+            <p data-i18n="p3.desc">اختر عدد الورود وأضف هدية إن أردت. الوردة بخمسة ريالات، ورسوم التنسيق عشرة ريالات لكل خمس ورود، والهدية بخمسة وعشرين ريالًا.</p>
+            <div class="builder" data-calc>
               <label class="builder-label" for="flower-count" data-i18n="builder.count">عدد الورود</label>
               <div class="stepper">
-                <button class="stepper-btn" type="button" data-step="-1" aria-label="وردة أقل" data-i18n-attr="aria-label:builder.less">
+                <button class="stepper-btn" type="button" data-calc-step="-1" aria-controls="flower-count" aria-label="وردة أقل" data-i18n-attr="aria-label:builder.less">
                   <svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg>
                 </button>
-                <input id="flower-count" type="number" inputmode="numeric" min="1" max="200" step="1" value="10">
-                <button class="stepper-btn" type="button" data-step="1" aria-label="وردة أكثر" data-i18n-attr="aria-label:builder.more">
+                <input id="flower-count" data-calc-count type="number" inputmode="numeric" min="1" max="200" step="1" value="10">
+                <button class="stepper-btn" type="button" data-calc-step="1" aria-controls="flower-count" aria-label="وردة أكثر" data-i18n-attr="aria-label:builder.more">
                   <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
                 </button>
               </div>
+              <label class="gift-toggle">
+                <input type="checkbox" data-calc-gift>
+                <span data-gift-label></span>
+                <span class="gift-price" data-gift-price></span>
+              </label>
               <dl class="price-breakdown">
-                <div><dt data-i18n="builder.flowers">الورود</dt><dd data-cost="flowers"></dd></div>
-                <div><dt data-i18n="builder.fee">رسوم التنسيق</dt><dd data-cost="fee"></dd></div>
-                <div class="price-total"><dt data-i18n="builder.total">المجموع</dt><dd data-cost="total" aria-live="polite"></dd></div>
+                <div><dt data-i18n="builder.flowers">الورود</dt><dd data-calc-cost="flowers"></dd></div>
+                <div><dt data-i18n="builder.fee">رسوم التنسيق</dt><dd data-calc-cost="fee"></dd></div>
+                <div data-gift-row hidden><dt data-i18n="builder.gift">الهدية</dt><dd data-calc-cost="gift"></dd></div>
+                <div class="price-total"><dt data-i18n="builder.total">المجموع</dt><dd data-calc-cost="total" aria-live="polite"></dd></div>
               </dl>
+              <p class="field-hint" data-i18n="builder.extras">لا يشمل المجموع المزهرية أو الإضافات الأخرى، ونؤكدها معك على واتساب.</p>
             </div>
             <button class="btn btn-primary" type="button" data-order="custom" data-i18n="product.custom">اطلب هذه الباقة</button>
           </div>
@@ -258,6 +265,31 @@
         <button class="icon-btn" type="button" data-close aria-label="إغلاق" data-i18n-attr="aria-label:order.close">
           <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
         </button>
+      </div>
+
+      <div class="builder" data-calc>
+        <label class="builder-label" for="f-flowers" data-i18n="builder.count">عدد الورود</label>
+        <div class="stepper">
+          <button class="stepper-btn" type="button" data-calc-step="-1" aria-controls="f-flowers" aria-label="وردة أقل" data-i18n-attr="aria-label:builder.less">
+            <svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg>
+          </button>
+          <input id="f-flowers" data-calc-count type="number" inputmode="numeric" min="1" max="200" step="1" value="10">
+          <button class="stepper-btn" type="button" data-calc-step="1" aria-controls="f-flowers" aria-label="وردة أكثر" data-i18n-attr="aria-label:builder.more">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+          </button>
+        </div>
+        <label class="gift-toggle">
+          <input type="checkbox" data-calc-gift>
+          <span data-gift-label></span>
+          <span class="gift-price" data-gift-price></span>
+        </label>
+        <dl class="price-breakdown">
+          <div><dt data-i18n="builder.flowers">الورود</dt><dd data-calc-cost="flowers"></dd></div>
+          <div><dt data-i18n="builder.fee">رسوم التنسيق</dt><dd data-calc-cost="fee"></dd></div>
+          <div data-gift-row hidden><dt data-i18n="builder.gift">الهدية</dt><dd data-calc-cost="gift"></dd></div>
+          <div class="price-total"><dt data-i18n="builder.total">المجموع</dt><dd data-calc-cost="total" aria-live="polite"></dd></div>
+        </dl>
+        <p class="field-hint" data-i18n="builder.extras">لا يشمل المجموع المزهرية أو الإضافات الأخرى، ونؤكدها معك على واتساب.</p>
       </div>
 
       <div class="error-summary" id="error-summary" tabindex="-1" hidden>
