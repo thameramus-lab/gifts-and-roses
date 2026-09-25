@@ -6,7 +6,7 @@ Website for Gifts & Roses, a floral and gift boutique in Jeddah. Arabic by defau
 
 Edit `assets/js/config.js`:
 
-- `whatsapp`: the shop's WhatsApp number, digits only, starting with 966 (e.g. `966512345678`). The placeholder `966500000000` must be replaced.
+- `whatsapp`: the shop's WhatsApp number, digits only, starting with 966 (e.g. `966512345678`). Currently set to 056 600 0069.
 - `instagram`: username without the @, or leave empty to hide the button.
 - `prices`: price in SAR for each product, or `null` to hide it.
 
