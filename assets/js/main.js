@@ -54,6 +54,97 @@
     });
   });
 
+  // ---- Shop by occasion ----
+  const productCards = [...document.querySelectorAll("[data-customise]")].map((btn) => ({
+    occasions: cfg.products[btn.dataset.customise].occasions ?? [],
+    card: btn.closest("li"),
+  }));
+  const occasions = document.querySelector("[data-occasions]");
+  occasions.querySelectorAll("input").forEach((input) => {
+    const used = input.value === "all" || productCards.some((p) => p.occasions.includes(input.value));
+    input.closest("label").hidden = !used;
+  });
+  occasions.addEventListener("change", (e) => {
+    const value = e.target.value;
+    for (const p of productCards) p.card.hidden = value !== "all" && !p.occasions.includes(value);
+  });
+
+  // ---- Opening hours and ways to pay (hidden until set in config.js) ----
+  const toMinutes = (hhmm) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    return h * 60 + m;
+  };
+
+  function isOpenNow() {
+    const parts = Object.fromEntries(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Riyadh", weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+      }).formatToParts(new Date()).map((p) => [p.type, p.value]),
+    );
+    const day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+    const now = Number(parts.hour) * 60 + Number(parts.minute);
+    return cfg.hours.some((rule) => {
+      const open = toMinutes(rule.open), close = toMinutes(rule.close);
+      if (close > open) return rule.days.includes(day) && now >= open && now < close;
+      // Closes after midnight: open from `open` today, or until `close` for yesterday's opening.
+      return (rule.days.includes(day) && now >= open) || (rule.days.includes((day + 6) % 7) && now < close);
+    });
+  }
+
+  function renderShopInfo() {
+    const m = msg();
+    const hoursBox = document.querySelector("[data-hours]");
+    hoursBox.hidden = !cfg.hours?.length;
+    if (cfg.hours?.length) {
+      // 7 January 2024 was a Sunday, so day n falls on the 7th + n.
+      const dayName = (n) => new Date(2024, 0, 7 + n).toLocaleDateString(m.locale, { weekday: "long" });
+      const time = (hhmm) => {
+        const [h, min] = hhmm.split(":").map(Number);
+        return new Date(2024, 0, 1, h, min).toLocaleTimeString(m.locale, { hour: "numeric", minute: "2-digit", hour12: true });
+      };
+      const list = document.querySelector("[data-hours-list]");
+      list.replaceChildren(...cfg.hours.map((rule) => {
+        const days = rule.days;
+        const inARow = days.length > 2 && days.every((d, i) => i === 0 || d === (days[i - 1] + 1) % 7);
+        const row = document.createElement("div");
+        const dt = document.createElement("dt");
+        const dd = document.createElement("dd");
+        dt.textContent = inARow ? `${dayName(days[0])} – ${dayName(days.at(-1))}` : m.list(days.map(dayName));
+        dd.textContent = `${time(rule.open)} – ${time(rule.close)}`;
+        row.append(dt, dd);
+        return row;
+      }));
+      const badge = document.querySelector("[data-open-now]");
+      const open = isOpenNow();
+      badge.textContent = open ? m.openNow : m.closedNow;
+      badge.classList.toggle("is-open", open);
+    }
+
+    const payBox = document.querySelector("[data-payments]");
+    payBox.hidden = !cfg.payments?.length;
+    document.querySelector("[data-payments-list]").replaceChildren(...(cfg.payments ?? []).map((id) => {
+      const li = document.createElement("li");
+      li.textContent = m.payments[id] ?? id;
+      return li;
+    }));
+  }
+
+  // ---- Floating WhatsApp button (phones) ----
+  // Hidden over the designer (it has its own order bar) and the contact section
+  // (it has its own WhatsApp button).
+  const floatBtn = document.querySelector("[data-wa-float]");
+  if ("IntersectionObserver" in window) {
+    const inView = new Set();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) inView.add(entry.target);
+        else inView.delete(entry.target);
+      }
+      floatBtn.classList.toggle("is-hidden", inView.size > 0);
+    });
+    for (const id of ["design", "contact"]) observer.observe(document.getElementById(id));
+  }
+
   // ---- Language ----
   function applyLang(next) {
     lang = next === "en" ? "en" : "ar";
@@ -78,6 +169,7 @@
 
     designer.render();
     renderProductPrices();
+    renderShopInfo();
     updateCardCount();
     if (dialog.open) renderOrderSummary();
 

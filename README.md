@@ -9,12 +9,14 @@ Edit `assets/js/config.js`:
 - `whatsapp`: the shop's WhatsApp number, digits only, starting with 966. Currently 056 705 6986.
 - `instagram`: username without the @ (currently `thamers_interlude_`), or leave empty to hide the button.
 - `mapsQuery`: what the "Open in Google Maps" button searches for.
+- `hours`: opening hours, shown with an "Open now / Closed now" label (Jeddah time). Empty = hidden.
+- `payments`: ways to pay (`"cash"`, `"mada"`, `"applepay"`, `"stcpay"`, `"transfer"`). Empty = hidden.
 - `designer`: "Design your gift" pricing, used for every price on the site:
   - `pricePerFlower`: 5 SAR per flower (roses in four colours, sunflowers, lilies).
   - `arrangingFee`: 15 SAR for every 5 flowers or part of 5 (1–5 flowers = 15, 6–10 = 30, …).
   - `balloonPrice`: 3 SAR each; `giftBoxPrice`: 25 SAR; `brandedPackagingPrice`: 0 (free).
   - `extras`: teddy bear, chocolates, scented candle. `null` shows "price on WhatsApp"; set a number to show the price.
-- `products`: what each product card loads into the designer (flowers, wrapping, balloons, gift box, extras, packaging). Card prices are worked out from these.
+- `products`: what each product card loads into the designer (flowers, wrapping, balloons, gift box, extras, packaging), and which "Shop by occasion" filters show it (`occasions`: `"birthday"`, `"love"`, `"congrats"`, `"getwell"`). Card prices are worked out from these.
 
 ## Editing text
 

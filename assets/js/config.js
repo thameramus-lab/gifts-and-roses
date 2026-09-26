@@ -12,6 +12,20 @@ window.SITE_CONFIG = {
   // What the "Open in Google Maps" button searches for.
   mapsQuery: "Aabir Al Qarath St, Obhur Al-Shamaliyah, Jeddah 23817",
 
+  // Opening hours, shown in the contact section with an "Open now" label.
+  // days: 0 = Sunday, 1 = Monday … 5 = Friday, 6 = Saturday. Jeddah time, 24-hour clock.
+  // A closing time earlier than the opening time means after midnight.
+  // Leave the list empty to hide opening hours. Example:
+  //   hours: [
+  //     { days: [6, 0, 1, 2, 3, 4], open: "10:00", close: "23:00" },
+  //     { days: [5], open: "16:00", close: "23:30" },
+  //   ],
+  hours: [],
+
+  // Ways to pay, shown in the contact section. Any of:
+  // "cash", "mada", "applepay", "stcpay", "transfer". Leave empty to hide.
+  payments: [],
+
   // "Design your gift" pricing and choices. All prices in Saudi riyals.
   designer: {
     pricePerFlower: 5,
@@ -47,8 +61,11 @@ window.SITE_CONFIG = {
 
   // Products on the page. "Customise" loads each one into the designer,
   // so its price is worked out from the same pricing as above.
+  // occasions: which "Shop by occasion" filters show the product. Any of:
+  // "birthday", "love", "congrats", "getwell".
   products: {
     "birthday-box": {
+      occasions: ["birthday"],
       flowers: { "rose-red": 10, lily: 3 },
       wrap: "black",
       balloons: ["black", "black", "gold", "gold", "pearl", "pearl"],
@@ -57,6 +74,7 @@ window.SITE_CONFIG = {
       branded: true,
     },
     "someone-special-box": {
+      occasions: ["love", "birthday"],
       flowers: { "rose-red": 12 },
       wrap: "black",
       balloons: [],
@@ -65,6 +83,7 @@ window.SITE_CONFIG = {
       branded: true,
     },
     "sunflower-bouquet": {
+      occasions: ["congrats", "getwell"],
       flowers: { sunflower: 7 },
       wrap: "kraft",
       balloons: [],
@@ -73,6 +92,7 @@ window.SITE_CONFIG = {
       branded: true,
     },
     "surprise-bouquet": {
+      occasions: ["birthday", "love", "congrats"],
       flowers: { "rose-pink": 6, "rose-white": 5 },
       wrap: "blush",
       balloons: [],
@@ -81,6 +101,7 @@ window.SITE_CONFIG = {
       branded: false,
     },
     "elegant-gift-set": {
+      occasions: ["love", "congrats"],
       flowers: { "rose-red": 12 },
       wrap: "white",
       balloons: [],

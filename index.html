@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="assets/css/styles.css">
-  <link rel="preload" as="image" href="assets/img/hero-bouquet-1400.webp" imagesrcset="assets/img/hero-bouquet-800.webp 800w, assets/img/hero-bouquet-1400.webp 1400w" imagesizes="(min-width: 900px) 55vw, 100vw">
+  <link rel="preload" as="image" href="assets/img/hero-photo-1200.webp" imagesrcset="assets/img/hero-photo-720.webp 720w, assets/img/hero-photo-1200.webp 1200w" imagesizes="(min-width: 900px) 440px, 90vw">
 
   <script type="application/ld+json">
   {
@@ -96,11 +96,11 @@
         </div>
         <div class="hero-art">
           <img
-            src="assets/img/hero-bouquet-1400.webp"
-            srcset="assets/img/hero-bouquet-800.webp 800w, assets/img/hero-bouquet-1400.webp 1400w"
-            sizes="(min-width: 900px) 55vw, 100vw"
-            width="1400" height="979"
-            alt="رسم بالألوان المائية لباقة ورود حمراء ووردية وكريمية مع علبة هدية مربوطة بشريط ذهبي"
+            src="assets/img/hero-photo-1200.webp"
+            srcset="assets/img/hero-photo-720.webp 720w, assets/img/hero-photo-1200.webp 1200w"
+            sizes="(min-width: 900px) 440px, 90vw"
+            width="1200" height="1500"
+            alt="علبة هدية سوداء مفتوحة فيها ورود حمراء وشوكولاتة وشمعة ودبدوب صغير، ومكتوب على غطائها: هدية صغيرة لشخص مميز"
             data-i18n-attr="alt:hero.alt"
             fetchpriority="high">
         </div>
@@ -113,6 +113,15 @@
           <h2 id="collection-title" data-i18n="collection.title">مجموعتنا</h2>
           <p data-i18n="collection.intro">اختر تصميمًا وخصّصه كما تحب، أو صمّم هديتك من البداية.</p>
         </div>
+
+        <fieldset class="occasions" data-occasions>
+          <legend class="visually-hidden" data-i18n="occasion.label">تسوّق حسب المناسبة</legend>
+          <label class="choice"><input type="radio" name="occasion" value="all" checked> <span data-i18n="occasion.all">الكل</span></label>
+          <label class="choice"><input type="radio" name="occasion" value="birthday"> <span data-i18n="occasion.birthday">عيد ميلاد</span></label>
+          <label class="choice"><input type="radio" name="occasion" value="love"> <span data-i18n="occasion.love">حب وذكرى زواج</span></label>
+          <label class="choice"><input type="radio" name="occasion" value="congrats"> <span data-i18n="occasion.congrats">تهنئة وشكر</span></label>
+          <label class="choice"><input type="radio" name="occasion" value="getwell"> <span data-i18n="occasion.getwell">سلامتك</span></label>
+        </fieldset>
 
         <ul class="products" role="list">
           <li class="product">
@@ -302,6 +311,14 @@
               <svg class="icon" aria-hidden="true"><use href="#i-map-pin"/></svg>
               <span data-i18n="address">شارع عابر القارات، أبحر الشمالية، جدة 23817</span>
             </address>
+            <div class="contact-info" data-hours hidden>
+              <p class="contact-label"><span data-i18n="contact.hours">ساعات العمل</span> <span class="open-badge" data-open-now></span></p>
+              <dl class="hours-list" data-hours-list></dl>
+            </div>
+            <div class="contact-info" data-payments hidden>
+              <p class="contact-label" data-i18n="contact.pay">طرق الدفع</p>
+              <ul class="pay-list" role="list" data-payments-list></ul>
+            </div>
             <div class="contact-actions">
               <a class="btn btn-primary" data-wa-link href="#contact">
                 <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
@@ -329,6 +346,10 @@
       <p>© <span data-year>2026</span> <span data-i18n="brand">هدايا وورود</span></p>
     </div>
   </footer>
+
+  <a class="wa-float" data-wa-link data-wa-float href="#contact" aria-label="راسلنا على واتساب" data-i18n-attr="aria-label:contact.whatsapp">
+    <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
+  </a>
 
   <dialog class="order-dialog" id="order-dialog" aria-labelledby="order-title">
     <form class="order-form" id="order-form" method="dialog" novalidate>
