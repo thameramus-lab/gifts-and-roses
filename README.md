@@ -1,6 +1,6 @@
 # Gifts & Roses
 
-Website for Gifts & Roses, a floral and gift boutique in Jeddah. Arabic by default with an English toggle; customers order through WhatsApp.
+Website for Gifts & Roses, a floral and gift boutique in Jeddah. Arabic by default with an English toggle; customers order and pay on the website.
 
 ## Shop settings
 
@@ -15,8 +15,26 @@ Edit `assets/js/config.js`:
   - `pricePerFlower`: 5 SAR per flower (roses in four colours, sunflowers, lilies).
   - `arrangingFee`: 15 SAR for every 5 flowers or part of 5 (1–5 flowers = 15, 6–10 = 30, …).
   - `balloonPrice`: 3 SAR each; `giftBoxPrice`: 25 SAR; `brandedPackagingPrice`: 0 (free).
-  - `extras`: teddy bear, chocolates, scented candle. `null` shows "price on WhatsApp"; set a number to show the price.
+  - `extras`: teddy bear, chocolates, scented candle. `null` shows "Price coming soon" and the item can't be ordered online; set a number to show the price.
 - `products`: what each product card loads into the designer (flowers, wrapping, balloons, gift box, extras, packaging), and which "Shop by occasion" filters show it (`occasions`: `"birthday"`, `"love"`, `"congrats"`, `"getwell"`). Card prices are worked out from these.
+
+## Ordering and payment
+
+Customers design a gift, fill in their details and pay on the website through [Moyasar](https://moyasar.com) (mada, credit card, Apple Pay, STC Pay). WhatsApp is only for questions.
+
+- **Pay online:** the full total is charged.
+- **Cash on delivery:** `cashFee` is added to the order, `cashDepositPercent` of the total is paid online as a deposit, and the rest is paid in cash. `cashFee` is currently a **placeholder (15 SAR)**.
+- Items without a price (`extras` set to `null`) can't be ordered online; the form says so.
+
+Settings are under `ordering` in `assets/js/config.js`:
+
+- `moyasarKey`: the shop's publishable key from the Moyasar dashboard. Empty = ordering is off and the form says it's being set up. Use `pk_test_...` to try it with Moyasar's test cards, then `pk_live_...` once the account is activated (needs the shop's commercial registration).
+- `methods`: `"creditcard"`, `"applepay"`, `"stcpay"`. Apple Pay and STC Pay also need enabling in the Moyasar dashboard; Apple Pay needs the website's domain verified there.
+- `orderEndpoint` (optional): a Google Sheet + email inbox for orders. Set it up with `google-apps-script/orders.gs` (steps at the top of that file).
+
+Every payment carries the full order (items, date, phone, card message, order number) as metadata, so the shop sees it in the Moyasar dashboard. Before preparing an order, check its payment there and that the amount matches the order total.
+
+The payment form library is in `assets/vendor/moyasar/` (MIT licence, from the `moyasar-payment-form` npm package, version 2.3.0).
 
 ## Editing text
 
@@ -36,9 +54,11 @@ Then open http://localhost:8000 (add `?lang=en` for English).
 - `index.html`: the page
 - `assets/css/styles.css`: styles (colour and type tokens at the top)
 - `assets/js/config.js`: shop details
-- `assets/js/i18n.js`: English strings and WhatsApp message wording
-- `assets/js/designer.js`: "Design your gift" controls, pricing and the live drawing
-- `assets/js/main.js`: language switching, product cards and the order form
+- `assets/js/i18n.js`: English text and the wording the scripts use
+- `assets/js/designer.js`: "Design your gift" controls, pricing and the photo board
+- `assets/js/main.js`: language switching, product cards, the order form and payment
+- `google-apps-script/orders.gs`: optional Google Sheet + email order inbox
+- `assets/vendor/moyasar/`: Moyasar payment form library
 - `assets/img/`: images cut from the logo and product photos
 
 It's a static site with no build step, so it can be hosted on GitHub Pages, Netlify or any web host.

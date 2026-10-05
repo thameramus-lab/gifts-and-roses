@@ -356,8 +356,19 @@
       };
     }
 
+    // Saved before the customer leaves for payment, restored when they come back.
+    function snapshot() {
+      return { state: clone(state), basedOn };
+    }
+    function restore(snap) {
+      state = clone(snap.state);
+      basedOn = snap.basedOn;
+      render();
+      onChange?.();
+    }
+
     render();
-    return { render, load, describe, priceFor: (id) => priceOf(clone(config.products[id]), d) };
+    return { render, load, describe, snapshot, restore, priceFor: (id) => priceOf(clone(config.products[id]), d) };
   }
 
   window.GiftDesigner = { create };

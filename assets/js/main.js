@@ -171,7 +171,7 @@
     renderProductPrices();
     renderShopInfo();
     updateCardCount();
-    if (dialog.open) renderOrderSummary();
+    if (dialog.open) renderOpenStep();
 
     try { localStorage.setItem(LANG_KEY, lang); } catch {}
     try {
@@ -201,14 +201,35 @@
   });
 
   // ---- Order dialog ----
+  // Step 1 (form): order details and how to pay. Step 2 (#order-pay): the Moyasar
+  // payment form. Step 3 (#order-done): confirmation, or a failed payment to retry.
+  // Online: the whole total is paid now. Cash: a cash fee is added and a deposit
+  // is paid now; the rest is paid in cash on delivery or pickup.
+  const ordering = cfg.ordering;
+  const PENDING_KEY = "gr-pending-order";
   const dialog = document.getElementById("order-dialog");
   const form = document.getElementById("order-form");
+  const paySection = document.getElementById("order-pay");
+  const doneSection = document.getElementById("order-done");
   const summary = document.getElementById("error-summary");
   const dateInput = form.elements.date;
   const cardInput = form.elements.card;
   const cardCount = document.getElementById("f-card-count");
-  const ready = document.getElementById("order-ready");
-  const readyLink = ready.querySelector("[data-ready-link]");
+
+  const store = {
+    get() {
+      try { return JSON.parse(sessionStorage.getItem(PENDING_KEY) || localStorage.getItem(PENDING_KEY)); } catch { return null; }
+    },
+    set(order) {
+      const json = JSON.stringify(order);
+      try { sessionStorage.setItem(PENDING_KEY, json); } catch {}
+      try { localStorage.setItem(PENDING_KEY, json); } catch {}
+    },
+    clear() {
+      try { sessionStorage.removeItem(PENDING_KEY); } catch {}
+      try { localStorage.removeItem(PENDING_KEY); } catch {}
+    },
+  };
 
   function todayISO() {
     const d = new Date();
@@ -216,7 +237,36 @@
     return d.toISOString().slice(0, 10);
   }
 
-  // The design as labelled lines, shared by the dialog summary and the WhatsApp message.
+  // Short, readable order number, e.g. GR-1005-K7Q2.
+  function newOrderId() {
+    const d = new Date();
+    const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    const rand = Array.from(crypto.getRandomValues(new Uint8Array(4)), (n) => chars[n % chars.length]).join("");
+    return `GR-${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${rand}`;
+  }
+
+  // Saudi mobile in any common form (05…, 5…, +9665…, 009665…, Arabic digits) → 05XXXXXXXX.
+  function normalisePhone(raw) {
+    const digits = raw.replace(/[٠-٩]/g, (c) => "٠١٢٣٤٥٦٧٨٩".indexOf(c)).replace(/\D/g, "");
+    const local = digits.replace(/^(00966|966)/, "").replace(/^0/, "");
+    return /^5\d{8}$/.test(local) ? `0${local}` : null;
+  }
+
+  function payChoice() {
+    return form.elements.pay.value;
+  }
+
+  // Totals for the current design and payment choice, in riyals.
+  function totals(pay = payChoice()) {
+    const base = designer.describe().price.total;
+    if (pay !== "cash") return { base, fee: 0, total: base, charge: base, rest: 0 };
+    const fee = ordering.cashFee;
+    const total = base + fee;
+    const deposit = Math.max(1, Math.ceil((total * ordering.cashDepositPercent) / 100));
+    return { base, fee, total, charge: deposit, rest: total - deposit };
+  }
+
+  // The design as labelled lines, shared by the summaries and the saved order.
   function designLines() {
     const m = msg();
     const d = designer.describe();
@@ -225,22 +275,33 @@
     if (d.wrap) lines.push([m.wrap, d.wrap]);
     if (d.balloons.length) lines.push([m.balloons, m.list(d.balloons)]);
     if (d.extras.length) lines.push([m.extras, m.list(d.extras)]);
-    let total = money(d.price.total);
-    if (d.price.unpriced.length) {
-      total += ` ${m.pricePlus(m.list(d.price.unpriced.map((id) => m.names.extra[id])))}`;
-    }
-    return { lines, branded: d.branded, total };
+    return { lines, branded: d.branded, unpriced: d.price.unpriced };
   }
 
-  function renderOrderSummary() {
+  // Summary rows: the design, packaging, cash fee, total, and deposit / rest for cash.
+  function summaryRows(pay = payChoice()) {
     const m = msg();
-    const { lines, branded, total } = designLines();
-    const box = dialog.querySelector("[data-order-summary]");
+    const { lines, branded } = designLines();
+    const sum = totals(pay);
+    const rows = [...lines];
+    if (branded) {
+      const p = cfg.designer.brandedPackagingPrice;
+      rows.push([m.packaging, p ? money(p) : m.free]);
+    }
+    if (sum.fee) rows.push([m.cashFeeLine, money(sum.fee)]);
+    rows.push([m.price, money(sum.total), "price-total"]);
+    if (pay === "cash") {
+      rows.push([m.depositLine(number(ordering.cashDepositPercent)), money(sum.charge)]);
+      rows.push([m.restLine, money(sum.rest)]);
+    }
+    return rows;
+  }
+
+  function renderRows(box, rows) {
     const list = document.createElement("dl");
-    const packagingPrice = cfg.designer.brandedPackagingPrice;
-    const packaging = branded ? [[m.packaging, packagingPrice ? money(packagingPrice) : m.free]] : [];
-    for (const [label, value] of [...lines, ...packaging, [m.price, total]]) {
+    for (const [label, value, cls] of rows) {
       const row = document.createElement("div");
+      if (cls) row.className = cls;
       const dt = document.createElement("dt");
       const dd = document.createElement("dd");
       dt.textContent = label;
@@ -248,8 +309,46 @@
       row.append(dt, dd);
       list.append(row);
     }
-    list.lastChild.classList.add("price-total");
     box.replaceChildren(list);
+  }
+
+  // What stops the order: online ordering not set up, or items without a price.
+  function blocker() {
+    const m = msg();
+    if (!ordering.moyasarKey) return m.blockedSetup;
+    const { unpriced } = designLines();
+    if (unpriced.length) return m.blockedUnpriced(m.list(unpriced.map((id) => m.names.extra[id])));
+    return null;
+  }
+
+  function renderOrderForm() {
+    const m = msg();
+    const pay = payChoice();
+    const sum = totals(pay);
+    renderRows(dialog.querySelector("[data-order-summary]"), summaryRows(pay));
+    dialog.querySelector("[data-cash-fee-hint]").textContent =
+      m.cashFeeHint(money(ordering.cashFee), number(ordering.cashDepositPercent));
+    form.querySelector("[data-order-total]").textContent = money(sum.charge);
+    form.querySelector(".order-total span").textContent = pay === "cash" ? m.payDeposit : t("order.totalLabel");
+    form.querySelector("[data-submit-label]").textContent = pay === "cash" ? m.submitCash : m.submitOnline;
+    form.querySelector("[data-submit-note]").textContent =
+      pay === "cash" ? m.noteCash(money(sum.charge), money(sum.rest)) : m.noteOnline;
+
+    const blocked = blocker();
+    const note = form.querySelector("[data-order-blocked]");
+    note.hidden = !blocked;
+    if (blocked) {
+      note.textContent = blocked + " ";
+      if (!ordering.moyasarKey) {
+        const link = document.createElement("a");
+        link.href = waUrl(m.general);
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = t("contact.whatsapp");
+        note.append(link);
+      }
+    }
+    form.querySelector("[data-submit]").disabled = !!blocked;
   }
 
   function updateConditionalFields() {
@@ -267,47 +366,57 @@
     form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
   }
 
-  function showForm() {
-    ready.hidden = true;
-    form.hidden = false;
+  function showStep(step) {
+    form.hidden = step !== "form";
+    paySection.hidden = step !== "pay";
+    doneSection.hidden = step !== "done";
   }
 
-  function openOrder() {
-    showForm();
+  function renderOpenStep() {
+    if (!form.hidden) renderOrderForm();
+  }
+
+  function openOrder(values) {
     form.reset();
     clearErrors();
-    renderOrderSummary();
+    if (values) {
+      for (const [name, value] of Object.entries(values)) {
+        const field = form.elements[name];
+        if (field) field.value = value;
+      }
+    }
     dateInput.min = todayISO();
     updateConditionalFields();
     updateCardCount();
-    dialog.showModal();
+    showStep("form");
+    renderOrderForm();
+    if (!dialog.open) dialog.showModal();
   }
 
-  document.querySelectorAll("[data-d-order]").forEach((btn) => btn.addEventListener("click", openOrder));
-  dialog.querySelector("[data-close]").addEventListener("click", () => dialog.close());
+  document.querySelectorAll("[data-d-order]").forEach((btn) => btn.addEventListener("click", () => openOrder()));
+  dialog.querySelectorAll("[data-close]").forEach((btn) => btn.addEventListener("click", () => dialog.close()));
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) dialog.close();
   });
   form.addEventListener("change", (e) => {
     if (e.target.name === "fulfil") updateConditionalFields();
+    if (e.target.name === "pay") renderOrderForm();
   });
   cardInput.addEventListener("input", updateCardCount);
-  readyLink.addEventListener("click", () => setTimeout(() => dialog.close(), 0));
-  ready.querySelector("[data-ready-back]").addEventListener("click", () => {
-    showForm();
-    form.querySelector("button[type=submit]").focus();
+  paySection.querySelector("[data-pay-back]").addEventListener("click", () => {
+    showStep("form");
+    form.querySelector("[data-submit]").focus();
   });
 
   function validate() {
     const errors = [];
     const m = msg();
+    const f = form.elements;
     if (!dateInput.value) errors.push([dateInput, m.errDate]);
     else if (dateInput.value < dateInput.min) errors.push([dateInput, m.errDatePast]);
-
-    const district = form.elements.district;
-    if (form.elements.fulfil.value === "delivery" && !district.value.trim()) {
-      errors.push([district, m.errDistrict]);
-    }
+    if (f.fulfil.value === "delivery" && !f.district.value.trim()) errors.push([f.district, m.errDistrict]);
+    if (!f.name.value.trim()) errors.push([f.name, m.errName]);
+    if (!normalisePhone(f.phone.value)) errors.push([f.phone, m.errPhone]);
     return errors;
   }
 
@@ -331,49 +440,200 @@
     summary.focus();
   }
 
-  function buildMessage() {
+  // Everything about the order, saved before payment and sent to the shop afterwards.
+  function buildOrder() {
     const m = msg();
     const f = form.elements;
+    const pay = payChoice();
+    const sum = totals(pay);
     const delivery = f.fulfil.value === "delivery";
     const [y, mo, d] = f.date.value.split("-").map(Number);
     const date = new Date(y, mo - 1, d).toLocaleDateString(m.locale, {
       weekday: "long", day: "numeric", month: "long", year: "numeric",
     });
-    const { lines: design, branded, total } = designLines();
-    const lines = [m.greeting, ...design.map(([label, value]) => `• ${label}: ${value}`)];
-    if (branded) lines.push(`• ${m.brandedYes}`);
-    lines.push(`• ${m.price}: ${total}`);
-    lines.push(`• ${delivery ? m.delivery : m.pickup} — ${m.date}: ${date}`);
-    lines.push(`• ${m.time}: ${f.time.selectedOptions[0].textContent}`);
-    if (delivery) lines.push(`• ${m.district}: ${f.district.value.trim()}`);
-    if (f.details.value.trim()) lines.push(`• ${m.details}: ${f.details.value.trim()}`);
-    if (f.card.value.trim()) lines.push(`• ${m.card}: ${f.card.value.trim()}`);
-    if (f.name.value.trim()) lines.push(`• ${m.name}: ${f.name.value.trim()}`);
-    return lines.join("\n");
+    const values = {};
+    for (const name of ["fulfil", "date", "time", "district", "name", "phone", "card", "details", "pay"]) {
+      values[name] = f[name].value;
+    }
+    const { lines, branded } = designLines();
+    return {
+      id: newOrderId(),
+      createdAt: new Date().toISOString(),
+      lang,
+      pay,
+      total: sum.total,
+      charge: sum.charge,
+      rest: sum.rest,
+      cashFee: sum.fee,
+      name: f.name.value.trim(),
+      phone: normalisePhone(f.phone.value),
+      fulfil: delivery ? m.delivery : m.pickup,
+      date,
+      time: f.time.selectedOptions[0].textContent,
+      district: delivery ? f.district.value.trim() : "",
+      card: f.card.value.trim(),
+      notes: f.details.value.trim(),
+      design: lines.map(([label, value]) => `${label}: ${value}`).join(" | "),
+      branded,
+      rows: summaryRows(pay),
+      values,
+      snapshot: designer.snapshot(),
+    };
+  }
+
+  // Order details attached to the Moyasar payment, so the shop sees them in its dashboard.
+  function metadataFor(order) {
+    const clip = (v) => String(v ?? "").slice(0, 400);
+    return Object.fromEntries(Object.entries({
+      order_id: order.id,
+      payment_type: order.pay === "cash" ? "cash_on_delivery_deposit" : "paid_in_full",
+      order_total_sar: order.total,
+      paid_now_sar: order.charge,
+      cash_due_sar: order.rest,
+      customer_name: order.name,
+      customer_phone: order.phone,
+      fulfilment: order.fulfil,
+      date: order.date,
+      time: order.time,
+      district: order.district,
+      design: order.design,
+      branded_packaging: order.branded ? "yes" : "no",
+      card_message: order.card,
+      notes: order.notes,
+      language: order.lang,
+    }).filter(([, v]) => v !== "" && v != null).map(([k, v]) => [k, clip(v)]));
+  }
+
+  let moyasarLoading = null;
+  function loadMoyasar() {
+    if (window.Moyasar) return Promise.resolve(window.Moyasar);
+    moyasarLoading ??= new Promise((resolve, reject) => {
+      const css = document.createElement("link");
+      css.rel = "stylesheet";
+      css.href = "assets/vendor/moyasar/moyasar.css";
+      document.head.append(css);
+      const script = document.createElement("script");
+      script.src = "assets/vendor/moyasar/moyasar.umd.js";
+      script.onload = () => resolve(window.Moyasar);
+      script.onerror = () => { moyasarLoading = null; reject(new Error("moyasar")); };
+      document.head.append(script);
+    });
+    return moyasarLoading;
+  }
+
+  async function startPayment(order) {
+    const m = msg();
+    showStep("pay");
+    paySection.querySelector("[data-pay-amount]").textContent = money(order.charge);
+    const error = paySection.querySelector("[data-pay-error]");
+    error.hidden = true;
+    const container = document.getElementById("mysr-form");
+    container.replaceChildren();
+    document.getElementById("pay-title").focus();
+    try {
+      const Moyasar = await loadMoyasar();
+      const methods = ordering.methods;
+      Moyasar.init({
+        element: "#mysr-form",
+        amount: Math.round(order.charge * 100),
+        currency: "SAR",
+        description: order.pay === "cash" ? `Gifts & Roses deposit, order ${order.id}` : `Gifts & Roses order ${order.id}`,
+        publishable_api_key: ordering.moyasarKey,
+        callback_url: location.href.split("#")[0],
+        language: lang,
+        methods,
+        metadata: metadataFor(order),
+        ...(methods.includes("applepay") && {
+          apple_pay: {
+            country: "SA",
+            label: ordering.applePayLabel,
+            validate_merchant_url: "https://api.moyasar.com/v1/applepay/initiate",
+          },
+        }),
+        // Moyasar requires an async function here.
+        on_completed: async (payment) => {
+          store.set({ ...order, paymentId: payment.id });
+        },
+      });
+    } catch {
+      error.textContent = m.payLoadError;
+      error.hidden = false;
+    }
+  }
+
+  // Optional Google Sheet + email for the shop (see google-apps-script/orders.gs).
+  function sendToShop(order, paymentId, status) {
+    if (!ordering.orderEndpoint) return Promise.resolve();
+    const { snapshot, values, rows, ...rest } = order;
+    return fetch(ordering.orderEndpoint, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ ...rest, paymentId, paymentStatus: status }),
+    }).catch(() => {});
+  }
+
+  function showDone(order, ok, reason) {
+    const m = msg();
+    showStep("done");
+    const title = doneSection.querySelector("[data-done-title]");
+    const text = doneSection.querySelector("[data-done-text]");
+    const ref = doneSection.querySelector("[data-done-ref]");
+    const retry = doneSection.querySelector("[data-done-retry]");
+    if (ok) {
+      title.textContent = order.pay === "cash" ? m.doneCashTitle : m.donePaidTitle;
+      text.textContent = order.pay === "cash" ? m.doneCashText(money(order.rest), order.phone) : m.donePaidText(order.phone);
+      ref.textContent = m.doneRef(order.id);
+      ref.hidden = false;
+    } else {
+      title.textContent = m.failTitle;
+      text.textContent = m.failText(reason);
+      ref.hidden = true;
+    }
+    renderRows(doneSection.querySelector("[data-done-summary]"), order.rows);
+    retry.hidden = ok;
+    retry.onclick = () => openOrder(order.values);
+    if (!dialog.open) dialog.showModal();
+    title.focus();
   }
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     clearErrors();
+    if (blocker()) return;
     const errors = validate();
     if (errors.length) {
       showErrors(errors);
       return;
     }
-    const url = waUrl(buildMessage());
-    // "noopener" as a window feature makes window.open return null, so detach manually.
-    const win = window.open(url, "_blank");
-    if (win) {
-      win.opener = null;
-      dialog.close();
-      return;
-    }
-    // Pop-up blocked: offer a plain link to WhatsApp instead.
-    readyLink.href = url;
-    form.hidden = true;
-    ready.hidden = false;
-    document.getElementById("order-ready-title").focus();
+    const order = buildOrder();
+    store.set(order);
+    startPayment(order);
   });
+
+  // Back from Moyasar: the payment page returns here with ?id=…&status=…&message=…
+  function handlePaymentReturn() {
+    const params = new URLSearchParams(location.search);
+    const paymentId = params.get("id");
+    const status = params.get("status");
+    if (!paymentId || !status) return;
+    const reason = params.get("message");
+    try {
+      const url = new URL(location.href);
+      for (const key of ["id", "status", "message"]) url.searchParams.delete(key);
+      history.replaceState(null, "", url);
+    } catch {}
+    const order = store.get();
+    if (!order) return;
+    designer.restore(order.snapshot);
+    if (status === "paid") {
+      store.clear();
+      sendToShop(order, paymentId, status);
+      showDone(order, true);
+    } else {
+      showDone(order, false, reason);
+    }
+  }
 
   // ---- Start ----
   document.querySelector("[data-lang-toggle]").addEventListener("click", () => {
@@ -385,4 +645,5 @@
     try { initial = localStorage.getItem(LANG_KEY); } catch {}
   }
   applyLang(initial || "ar");
+  handlePaymentReturn();
 })();

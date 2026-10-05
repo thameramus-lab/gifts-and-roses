@@ -67,10 +67,9 @@
       </nav>
       <div class="header-actions">
         <button class="lang-toggle" type="button" data-lang-toggle lang="en" aria-label="Switch to English">English</button>
-        <a class="btn btn-small btn-primary" data-wa-link href="#contact">
-          <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
-          <span class="btn-label-long" data-i18n="cta.whatsapp">اطلب عبر واتساب</span>
-          <span class="btn-label-short" data-i18n="cta.whatsappShort">واتساب</span>
+        <a class="btn btn-small btn-primary" href="#design">
+          <span class="btn-label-long" data-i18n="cta.order">اطلب الآن</span>
+          <span class="btn-label-short" data-i18n="cta.orderShort">اطلب</span>
         </a>
       </div>
     </div>
@@ -86,7 +85,7 @@
             <a class="btn btn-primary" href="#collection" data-i18n="hero.primary">تصفّح المجموعة</a>
             <a class="btn btn-quiet" data-wa-link href="#contact">
               <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
-              <span data-i18n="cta.whatsapp">اطلب عبر واتساب</span>
+              <span data-i18n="cta.ask">اسألنا عبر واتساب</span>
             </a>
           </div>
           <p class="hero-location">
@@ -293,8 +292,8 @@
             <p data-i18n="how.2.text">اختر يوم التوصيل أو الاستلام، واكتب الرسالة التي ترافق الهدية.</p>
           </li>
           <li>
-            <h3 data-i18n="how.3.title">أرسل الطلب عبر واتساب</h3>
-            <p data-i18n="how.3.text">تصلنا تفاصيل طلبك جاهزة في المحادثة، ونؤكد معك السعر والموعد.</p>
+            <h3 data-i18n="how.3.title">ادفع واستلم التأكيد</h3>
+            <p data-i18n="how.3.text">ادفع إلكترونيًا بمدى أو البطاقة أو Apple Pay أو STC Pay، أو نقدًا عند الاستلام، ويصلك رقم طلبك فورًا.</p>
           </li>
         </ol>
       </div>
@@ -352,7 +351,7 @@
   </a>
 
   <dialog class="order-dialog" id="order-dialog" aria-labelledby="order-title">
-    <form class="order-form" id="order-form" method="dialog" novalidate>
+    <form class="order-form" id="order-form" novalidate>
       <div class="dialog-head">
         <div>
           <h2 id="order-title" data-i18n="order.title">تفاصيل الطلب</h2>
@@ -402,10 +401,17 @@
         <p class="field-error" id="f-district-error" hidden></p>
       </div>
 
-      <div class="field">
-        <label for="f-details" data-i18n="order.details">ملاحظات (اختياري)</label>
-        <textarea id="f-details" name="details" rows="2" aria-describedby="f-details-hint"></textarea>
-        <p class="field-hint" id="f-details-hint" data-i18n="order.detailsHint">مثال: المناسبة، أو نص تريده على البالون.</p>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-name"><span data-i18n="order.name">اسمك</span> <span class="req" aria-hidden="true">*</span></label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required aria-describedby="f-name-error">
+          <p class="field-error" id="f-name-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="f-phone"><span data-i18n="order.phone">رقم الجوال</span> <span class="req" aria-hidden="true">*</span></label>
+          <input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required placeholder="05XXXXXXXX" aria-describedby="f-phone-error">
+          <p class="field-error" id="f-phone-error" hidden></p>
+        </div>
       </div>
 
       <div class="field">
@@ -415,28 +421,68 @@
       </div>
 
       <div class="field">
-        <label for="f-name" data-i18n="order.name">اسمك (اختياري)</label>
-        <input id="f-name" name="name" type="text" autocomplete="name">
+        <label for="f-details" data-i18n="order.details">ملاحظات (اختياري)</label>
+        <textarea id="f-details" name="details" rows="2" aria-describedby="f-details-hint"></textarea>
+        <p class="field-hint" id="f-details-hint" data-i18n="order.detailsHint">مثال: المناسبة، أو نص تريده على البالون.</p>
       </div>
 
+      <fieldset class="field">
+        <legend data-i18n="order.payHow">طريقة الدفع</legend>
+        <div class="pay-options">
+          <label class="pay-option">
+            <input type="radio" name="pay" value="online" checked>
+            <span class="pay-option-text">
+              <strong data-i18n="order.payOnline">ادفع الآن إلكترونيًا</strong>
+              <small data-i18n="order.payOnlineHint">مدى، بطاقة ائتمانية، Apple Pay، STC Pay</small>
+            </span>
+          </label>
+          <label class="pay-option">
+            <input type="radio" name="pay" value="cash">
+            <span class="pay-option-text">
+              <strong data-i18n="order.payCash">نقدًا عند الاستلام</strong>
+              <small data-cash-fee-hint></small>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <p class="order-blocked" data-order-blocked hidden></p>
+
       <div class="dialog-foot">
-        <button class="btn btn-primary btn-block" type="submit">
-          <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
-          <span data-i18n="order.submit">متابعة على واتساب</span>
+        <p class="order-total"><span data-i18n="order.totalLabel">المجموع</span> <strong data-order-total></strong></p>
+        <button class="btn btn-primary btn-block" type="submit" data-submit>
+          <span data-submit-label></span>
         </button>
-        <p class="field-hint" data-i18n="order.note">سيفتح واتساب برسالة جاهزة. راجِعها ثم اضغط إرسال.</p>
+        <p class="field-hint" data-submit-note></p>
       </div>
     </form>
 
-    <div class="order-ready" id="order-ready" hidden>
-      <h2 id="order-ready-title" tabindex="-1" data-i18n="order.readyTitle">طلبك جاهز</h2>
-      <p data-i18n="order.readyText">اضغط الزر لفتح واتساب برسالة الطلب، ثم اضغط إرسال.</p>
-      <a class="btn btn-primary btn-block" data-ready-link href="#" target="_blank" rel="noopener">
-        <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
-        <span data-i18n="order.readyOpen">افتح واتساب</span>
-      </a>
-      <button class="btn btn-quiet btn-block" type="button" data-ready-back data-i18n="order.readyEdit">تعديل الطلب</button>
-    </div>
+    <section class="order-step" id="order-pay" aria-labelledby="pay-title" hidden>
+      <div class="dialog-head">
+        <div>
+          <h2 id="pay-title" tabindex="-1" data-i18n="pay.title">الدفع</h2>
+          <p class="order-product"><span data-i18n="pay.amount">المبلغ</span> <strong data-pay-amount></strong></p>
+        </div>
+        <button class="icon-btn" type="button" data-close aria-label="إغلاق" data-i18n-attr="aria-label:order.close">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+      </div>
+      <div class="mysr-form" id="mysr-form"></div>
+      <p class="field-hint" data-pay-error hidden></p>
+      <p class="field-hint" data-i18n="pay.secure">تتم معالجة الدفع بأمان عبر ميسّر، ولا تمر بيانات بطاقتك عبر موقعنا.</p>
+      <button class="btn btn-quiet btn-block" type="button" data-pay-back data-i18n="pay.back">رجوع لتفاصيل الطلب</button>
+    </section>
+
+    <section class="order-step order-done" id="order-done" hidden>
+      <h2 id="order-done-title" tabindex="-1" data-done-title></h2>
+      <p data-done-text></p>
+      <p class="order-ref" data-done-ref></p>
+      <div class="order-summary" data-done-summary></div>
+      <div class="done-actions">
+        <button class="btn btn-primary btn-block" type="button" data-done-retry hidden data-i18n="done.retry">حاول مرة أخرى</button>
+        <button class="btn btn-quiet btn-block" type="button" data-close data-i18n="done.close">تم</button>
+      </div>
+    </section>
   </dialog>
 
   <script src="assets/js/config.js"></script>

@@ -31,6 +31,29 @@ window.SITE_CONFIG = {
   // PLACEHOLDER: sample payment methods. Replace with what the shop accepts.
   payments: ["cash", "mada", "applepay", "stcpay"],
 
+  // Ordering and payment.
+  ordering: {
+    // Moyasar publishable key (Moyasar dashboard → Settings → API keys).
+    // pk_test_... while testing, pk_live_... once the shop's account is activated.
+    // Empty = online ordering is off and the order form says it's being set up.
+    moyasarKey: "",
+    // Payment methods offered in the Moyasar form: "creditcard" (mada, Visa,
+    // Mastercard), "applepay", "stcpay". Apple Pay and STC Pay must also be
+    // enabled for the shop in the Moyasar dashboard.
+    methods: ["creditcard", "applepay", "stcpay"],
+    // Shown on the Apple Pay sheet. English letters only.
+    applePayLabel: "Gifts and Roses",
+    // Cash on delivery: extra fee added to the order, and the share of the
+    // total paid online up front as a deposit (the rest is paid in cash).
+    // PLACEHOLDER fee: replace with the shop's real fee.
+    cashFee: 15,
+    cashDepositPercent: 10,
+    // Optional: Google Apps Script web app URL that adds each order to a
+    // Google Sheet and emails the shop (see google-apps-script/orders.gs).
+    // Every paid order and deposit is in the Moyasar dashboard either way.
+    orderEndpoint: "",
+  },
+
   // "Design your gift" pricing and choices. All prices in Saudi riyals.
   designer: {
     pricePerFlower: 5,
