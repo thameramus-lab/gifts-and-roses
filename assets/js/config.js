@@ -20,11 +20,16 @@ window.SITE_CONFIG = {
   //     { days: [6, 0, 1, 2, 3, 4], open: "10:00", close: "23:00" },
   //     { days: [5], open: "16:00", close: "23:30" },
   //   ],
-  hours: [],
+  // PLACEHOLDER: sample hours for showing the shop. Replace with the shop's real hours.
+  hours: [
+    { days: [6, 0, 1, 2, 3, 4], open: "10:00", close: "23:00" },
+    { days: [5], open: "16:00", close: "01:00" },
+  ],
 
   // Ways to pay, shown in the contact section. Any of:
   // "cash", "mada", "applepay", "stcpay", "transfer". Leave empty to hide.
-  payments: [],
+  // PLACEHOLDER: sample payment methods. Replace with what the shop accepts.
+  payments: ["cash", "mada", "applepay", "stcpay"],
 
   // "Design your gift" pricing and choices. All prices in Saudi riyals.
   designer: {

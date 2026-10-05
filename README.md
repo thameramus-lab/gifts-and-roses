@@ -9,8 +9,8 @@ Edit `assets/js/config.js`:
 - `whatsapp`: the shop's WhatsApp number, digits only, starting with 966. Currently 056 705 6986.
 - `instagram`: username without the @ (currently `thamers_interlude_`), or leave empty to hide the button.
 - `mapsQuery`: what the "Open in Google Maps" button searches for.
-- `hours`: opening hours, shown with an "Open now / Closed now" label (Jeddah time). Empty = hidden.
-- `payments`: ways to pay (`"cash"`, `"mada"`, `"applepay"`, `"stcpay"`, `"transfer"`). Empty = hidden.
+- `hours`: opening hours, shown with an "Open now / Closed now" label (Jeddah time). Empty = hidden. **Currently sample hours: replace before launch.**
+- `payments`: ways to pay (`"cash"`, `"mada"`, `"applepay"`, `"stcpay"`, `"transfer"`). Empty = hidden. **Currently sample methods: replace before launch.**
 - `designer`: "Design your gift" pricing, used for every price on the site:
   - `pricePerFlower`: 5 SAR per flower (roses in four colours, sunflowers, lilies).
   - `arrangingFee`: 15 SAR for every 5 flowers or part of 5 (1–5 flowers = 15, 6–10 = 30, …).
