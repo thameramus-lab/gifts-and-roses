@@ -30,6 +30,7 @@ Settings are under `ordering` in `assets/js/config.js`:
 
 - `moyasarKey`: the shop's publishable key from the Moyasar dashboard. Empty = ordering is off and the form says it's being set up. Use `pk_test_...` to try it with Moyasar's test cards, then `pk_live_...` once the account is activated (needs the shop's commercial registration).
 - `methods`: `"creditcard"`, `"applepay"`, `"stcpay"`. Apple Pay and STC Pay also need enabling in the Moyasar dashboard; Apple Pay needs the website's domain verified there.
+- **Apple Pay** shows only in Safari on iPhone, iPad or Mac, on an https address, once the domain is verified: download the domain association file from the Moyasar dashboard and add it to this repo as `.well-known/apple-developer-merchantid-domain-association` (no file extension). The empty `.nojekyll` file at the root makes GitHub Pages serve the `.well-known` folder; don't delete it.
 - `orderEndpoint` (optional): a Google Sheet + email inbox for orders. Set it up with `google-apps-script/orders.gs` (steps at the top of that file).
 
 Every payment carries the full order (items, date, phone, card message, order number) as metadata, so the shop sees it in the Moyasar dashboard. Before preparing an order, check its payment there and that the amount matches the order total.
